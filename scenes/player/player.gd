@@ -1,11 +1,15 @@
 extends CharacterBody2D
 
-const SPEED: float = 250.0
+const SPEED: float = 200.0
 const JUMP_VELOCITY: float = -350.0
 const GRAVITY: float = 800.0
 const MAX_FALL_SPEED: float = 400
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
+
+var air_resistance: float = 100
+var air_speed: float
+var in_air: bool
 
 enum PlayerState {
 	IDLE,
@@ -14,15 +18,17 @@ enum PlayerState {
 	RUNNING
 }
 
-var current_state : PlayerState = PlayerState.IDLE
+var current_state: PlayerState = PlayerState.IDLE
 
 func calculate_states() -> void:
 	if is_on_floor():
+		in_air = false
 		if velocity.x == 0:
 			change_state(PlayerState.IDLE)
 		else:
 			change_state(PlayerState.RUNNING)
 	else:
+		in_air = true
 		if velocity.y > 0:
 			change_state(PlayerState.FALLING)
 		else:
@@ -45,16 +51,19 @@ func change_state(new_state: PlayerState):
 
 func get_input() -> void:
 	velocity.x = 0
+	if in_air: 
+		air_speed = SPEED - air_resistance
 	if Input.is_action_pressed("left"):
-		velocity.x = -SPEED
+		velocity.x = - air_speed
 		anim_player.flip_h = true
 	elif Input.is_action_pressed("right"):
-		velocity.x = SPEED
+		velocity.x = air_speed
 		anim_player.flip_h = false
 	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-	# clamps falling speed
+		
+	# keeps falling speed between JUMP_VELOCITY, MAX_FALL_SPEED
 	velocity.y = clampf(velocity.y, JUMP_VELOCITY, MAX_FALL_SPEED)
 
 func check_if_falling(delta: float) -> void:

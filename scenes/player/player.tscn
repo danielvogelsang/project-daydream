@@ -161,9 +161,9 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_hn7j8")
 }],
-"loop": true,
+"loop": false,
 "name": &"Falling",
-"speed": 5.0
+"speed": 1.0
 }, {
 "frames": [{
 "duration": 1.0,
