@@ -1,106 +1,68 @@
 extends CharacterBody2D
 
+const SPEED: float = 250.0
+const JUMP_VELOCITY: float = -350.0
+const GRAVITY: float = 800.0
+const MAX_FALL_SPEED: float = 400
 
-const SPEED = 250.0
-const JUMP_VELOCITY = -350.0
-@onready var anim_player = $AnimatedSprite2D
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+@onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 
-enum State {
-	Idle,
-	Jumping,
-	Falling,
-	Running
+enum PlayerState {
+	IDLE,
+	JUMPING,
+	FALLING,
+	RUNNING
 }
 
-enum Where {
-	In_air,
-	On_ground
-}
-var current_state = State.Idle
-var current_where = Where.In_air
-var left_direction = false
+var current_state : PlayerState = PlayerState.IDLE
 
-func flip_check():
-	if velocity.x < 0 and left_direction == false:
-		flip()
-	elif velocity.x > 0 and left_direction == true:
-		flip()
-		
-func flip():
-	left_direction = !left_direction
-	scale.x = scale.x * -1
-
-func change_state(new_state: State):
-	current_state = new_state
-	anim_player.play(str(State.find_key(current_state)))
-	match current_state:
-		State.Jumping:
-			jump()
-	
-func change_where(new_where: Where):
-	current_where = new_where
-	match current_where:
-		Where:
-			jump()
-			
-func jump():
-	velocity.y = JUMP_VELOCITY
-	
-func running(direction):
-	velocity.x = move_toward(velocity.x, direction * SPEED , SPEED/6)
-
-func moving_in_air(direction):
-	velocity.x = move_toward(velocity.x, direction * SPEED, 10)
-	
-func falling(delta):
-	velocity.y += gravity * delta
-	
-func _process(delta):
-	var direction = Input.get_axis("left", "right")
-	match current_where:
-		Where.In_air:
-			if current_state != State.Falling:
-				change_state(State.Falling)
-		Where.On_ground:
-			flip_check()
-			if direction:
-				if current_state != State.Running:
-					change_state(State.Running)
-			else:
-				if current_state != State.Idle:
-					change_state(State.Idle)
-
-				
-				
-	match current_state:
-		State.Running:
-			running(direction)
-		State.Idle:
-			velocity.x = move_toward(velocity.x, 0, SPEED/2)
-		State.Falling:
-			falling(delta)
-			if direction:
-				moving_in_air(direction)
-			else:
-				velocity.x = move_toward(velocity.x, 0, SPEED/4)
-				
-	# Add the gravity.
-	if not is_on_floor():
-		if current_where != Where.In_air:
-			change_where(Where.In_air)
+func calculate_states() -> void:
 	if is_on_floor():
-		if current_where != Where.On_ground:
-			change_where(Where.On_ground)
-	
+		if velocity.x == 0:
+			change_state(PlayerState.IDLE)
+		else:
+			change_state(PlayerState.RUNNING)
+	else:
+		if velocity.y > 0:
+			change_state(PlayerState.FALLING)
+		else:
+			change_state(PlayerState.JUMPING)
 
-	# Handle jump.
+func change_state(new_state: PlayerState):
+	if new_state == current_state:
+		return
+	current_state = new_state
+	
+	match current_state:
+		PlayerState.IDLE:
+			anim_player.play("Idle")
+		PlayerState.RUNNING:
+			anim_player.play("Running")
+		PlayerState.JUMPING:
+			anim_player.play("Jumping")
+		PlayerState.FALLING:
+			anim_player.play("Falling")
+
+func get_input() -> void:
+	velocity.x = 0
+	if Input.is_action_pressed("left"):
+		velocity.x = -SPEED
+		anim_player.flip_h = true
+	elif Input.is_action_pressed("right"):
+		velocity.x = SPEED
+		anim_player.flip_h = false
+	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
-		change_state(State.Jumping)
+		velocity.y = JUMP_VELOCITY
+	# clamps falling speed
+	velocity.y = clampf(velocity.y, JUMP_VELOCITY, MAX_FALL_SPEED)
 
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
+func check_if_falling(delta: float) -> void:
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
 		
-	
+func _physics_process(delta: float) -> void:
+	check_if_falling(delta)
+	get_input()
 	move_and_slide()
+	calculate_states()
