@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 const SPEED: float = 200.0
 const JUMP_VELOCITY: float = -350.0
+const DIMINISHING_JUMP_VELOCITY: float = -150
 const GRAVITY: float = 800.0
 const MAX_FALL_SPEED: float = 400
 
@@ -69,6 +70,10 @@ func get_input() -> void:
 		velocity.x = air_speed
 		anim_player.flip_h = false
 	
+	# small jumps
+	if Input.is_action_just_released("jump") and velocity.y < 0:
+		velocity.y = DIMINISHING_JUMP_VELOCITY
+	
 	if Input.is_action_just_pressed("jump") and jump_available:
 		velocity.y = JUMP_VELOCITY
 		coyote_timeout()
@@ -90,7 +95,7 @@ func coyote_timeout() -> void:
 	jump_available = false
 
 func update_debug_label() -> void:
-	debug_label.text = "jump available: %s" % [jump_available]
+	debug_label.text = "jump available: %s\nstate: %s" % [jump_available, PlayerState.keys()[current_state]]
 
 func _physics_process(delta: float) -> void:
 	handle_falling(delta)

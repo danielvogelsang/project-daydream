@@ -178,7 +178,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_40sbp")
 }],
-"loop": true,
+"loop": false,
 "name": &"Idle",
 "speed": 5.0
 }, {
@@ -319,7 +319,7 @@ script = ExtResource("1_bgs47")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_75p20")
-animation = &"Falling"
+animation = &"Idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)
@@ -331,9 +331,9 @@ wait_time = 2.0
 [node name="DebugLabel" type="Label" parent="."]
 z_index = 1
 offset_left = -50.0
-offset_top = -22.0
+offset_top = -36.0
 offset_right = 250.0
-offset_bottom = 23.0
+offset_bottom = 9.0
 scale = Vector2(0.335701, 0.295532)
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
