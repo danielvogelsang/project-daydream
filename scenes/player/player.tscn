@@ -324,3 +324,20 @@ animation = &"Falling"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)
 shape = SubResource("CapsuleShape2D_3ofsw")
+
+[node name="CoyoteTimer" type="Timer" parent="."]
+wait_time = 2.0
+
+[node name="DebugLabel" type="Label" parent="."]
+z_index = 1
+offset_left = -50.0
+offset_top = -22.0
+offset_right = 250.0
+offset_bottom = 23.0
+scale = Vector2(0.335701, 0.295532)
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "TEST"
+horizontal_alignment = 1
+
+[connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]
