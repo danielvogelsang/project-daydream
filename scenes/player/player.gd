@@ -12,7 +12,6 @@ const MAX_FALL_SPEED: float = 400
 
 var air_resistance: float = 100
 var air_speed: float = SPEED
-var in_air: bool = false
 var jump_available: bool = true
 var coyote_time: float = 0.3
 
@@ -71,15 +70,13 @@ func get_input() -> void:
 		velocity.y = JUMP_VELOCITY
 		coyote_timeout()
 
-func is_in_air() -> void:
+func handle_jump_availability() -> void:
 	if is_on_floor():
-		in_air = false
 		jump_available = true
-	else: in_air = false
 
 func handle_air_speed() -> void:
 	velocity.x = 0
-	if in_air: 
+	if not is_on_floor(): 
 		air_speed = SPEED - air_resistance
 	else: 
 		air_speed = SPEED
@@ -95,6 +92,8 @@ func handle_coyote_timer() -> void:
 	if jump_available:
 		if coyote_timer.is_stopped():
 			coyote_timer.start(coyote_time)
+		if is_on_floor():
+			coyote_timer.stop()
 
 # set to false after timeout
 func coyote_timeout() -> void:
@@ -108,6 +107,6 @@ func _physics_process(delta: float) -> void:
 	get_input()
 	move_and_slide()
 	calculate_states()
-	is_in_air()
+	handle_jump_availability()
 	handle_coyote_timer()
 	update_debug_label()
