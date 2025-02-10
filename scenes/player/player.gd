@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 const SPEED: float = 200.0
 const JUMP_VELOCITY: float = -350.0
-const DIMINISHING_JUMP_VELOCITY: float = -150
+const DIMINISHING_JUMP_VELOCITY: float = 0.5
 const GRAVITY: float = 800.0
 const MAX_FALL_SPEED: float = 400
 
@@ -11,7 +11,7 @@ const MAX_FALL_SPEED: float = 400
 @onready var coyote_timer: Timer = $CoyoteTimer
 
 var air_resistance: float = 100
-var air_speed: float = SPEED
+var current_speed: float = SPEED
 var jump_available: bool = true
 var coyote_time: float = 0.3
 
@@ -51,20 +51,23 @@ func change_state(new_state: PlayerState):
 		PlayerState.FALLING:
 			anim_player.play("Falling")
 
+# handles all inputs
 func get_input() -> void:
-	handle_air_speed()
+	apply_air_resistance()
 	
 	if Input.is_action_pressed("left"):
-		velocity.x = - air_speed
+		velocity.x = - current_speed
 		anim_player.flip_h = true
 	elif Input.is_action_pressed("right"):
-		velocity.x = air_speed
+		velocity.x = current_speed
 		anim_player.flip_h = false
 	
-	# small jumps
-	# TODO: fix flying by spamming jump
+	jump()
+
+func jump() -> void:
+	# small jumps when jump button is released earlier
 	if Input.is_action_just_released("jump") and velocity.y < 0:
-		velocity.y = DIMINISHING_JUMP_VELOCITY
+		velocity.y *= DIMINISHING_JUMP_VELOCITY
 	
 	if Input.is_action_just_pressed("jump") and jump_available:
 		velocity.y = JUMP_VELOCITY
@@ -74,12 +77,12 @@ func handle_jump_availability() -> void:
 	if is_on_floor():
 		jump_available = true
 
-func handle_air_speed() -> void:
+func apply_air_resistance() -> void:
 	velocity.x = 0
 	if not is_on_floor(): 
-		air_speed = SPEED - air_resistance
+		current_speed = SPEED - air_resistance
 	else: 
-		air_speed = SPEED
+		current_speed = SPEED
 
 func handle_falling(delta: float) -> void:
 	if not is_on_floor():
