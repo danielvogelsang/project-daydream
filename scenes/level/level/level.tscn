@@ -156,6 +156,7 @@ script = ExtResource("1_8kisy")
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(200, 2.08165e-12)
 zoom = Vector2(3, 3)
+process_callback = 0
 script = ExtResource("3_mujxj")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]

@@ -340,4 +340,10 @@ theme_override_font_sizes/font_size = 32
 text = "TEST"
 horizontal_alignment = 1
 
+[node name="Trail" type="Line2D" parent="."]
+top_level = true
+position = Vector2(0, 12)
+width = 3.0
+default_color = Color(0.0941176, 1, 1, 1)
+
 [connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]

@@ -1,19 +1,23 @@
 extends CharacterBody2D
 
-const SPEED: float = 200.0
-const JUMP_VELOCITY: float = -350.0
+const SPEED: float = 190.0
+const JUMP_VELOCITY: float = -360.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
-const GRAVITY: float = 800.0
-const MAX_FALL_SPEED: float = 400
+const GRAVITY: float = 1000.0
+const FALLING_GRAVITY: float = 1200.0
+const MAX_FALL_SPEED: float = 360.0
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var debug_label: Label = $DebugLabel
 @onready var coyote_timer: Timer = $CoyoteTimer
+@onready var trail: Line2D = $Trail
 
-var air_resistance: float = 100
+var air_resistance: float = 90
 var current_speed: float = SPEED
 var jump_available: bool = true
 var coyote_time: float = 0.3
+
+var max_points: int = 50 # for trail debugging
 
 enum PlayerState {
 	IDLE,
@@ -48,6 +52,7 @@ func change_state(new_state: PlayerState):
 			anim_player.play("Running")
 		PlayerState.JUMPING:
 			anim_player.play("Jumping")
+			trail.clear_points()
 		PlayerState.FALLING:
 			anim_player.play("Falling")
 
@@ -84,9 +89,19 @@ func apply_air_resistance() -> void:
 	else: 
 		current_speed = SPEED
 
-func handle_falling(delta: float) -> void:
+# debugging trail for jump visualization
+func draw_trail() -> void:
 	if not is_on_floor():
-		velocity.y += GRAVITY * delta
+		trail.add_point(position)
+		if trail.get_point_count() > max_points:
+			trail.remove_point(0)
+
+func handle_falling(delta: float) -> void:
+	# falling gravity applied when falling
+	if current_state == PlayerState.FALLING:
+		velocity.y += FALLING_GRAVITY * delta
+	# normal gravity applied when jumping
+	else: velocity.y += GRAVITY * delta
 		
 	# keeps falling speed between JUMP_VELOCITY and MAX_FALL_SPEED
 	velocity.y = clampf(velocity.y, JUMP_VELOCITY, MAX_FALL_SPEED)
@@ -112,4 +127,5 @@ func _physics_process(delta: float) -> void:
 	calculate_states()
 	handle_jump_availability()
 	handle_coyote_timer()
+	draw_trail()
 	update_debug_label()
