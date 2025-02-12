@@ -22,7 +22,7 @@ enum PlayerState {
 }
 
 var current_state: PlayerState = PlayerState.IDLE
-var air_resistance: float = 30
+var air_resistance: float = 50
 var current_speed: float = SPEED
 var jump_available: bool = true
 var coyote_time: float = 0.2
@@ -77,6 +77,10 @@ func get_input() -> void:
 		anim_player.flip_h = false
 	
 	jump()
+	
+	# stomp
+	if Input.is_action_just_pressed("down"):
+		velocity.y = MAX_FALL_SPEED
 
 func jump() -> void:
 	# small jumps when jump button is released earlier
