@@ -1,18 +1,19 @@
 extends CharacterBody2D
 
 const SPEED: float = 150.0
-const JUMP_VELOCITY: float = -360.0
+const JUMP_VELOCITY: float = 360.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
 const GRAVITY: float = 1000.0 
 const FALLING_GRAVITY: float = 1500.0
 const MAX_FALL_SPEED: float = 400.0
-const APEX_THRESHOLD = 25
-const APEX_GRAVITY_MODIFIER = 0.5
+const APEX_THRESHOLD: int = 25
+const APEX_GRAVITY_MODIFIER: float = 0.5
+const AIR_RESISTANCE: float = 50
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var debug_label: Label = $DebugLabel
 @onready var coyote_timer: Timer = $CoyoteTimer
-
+@onready var gpu_particles_2d: GPUParticles2D = $GPUParticles2D
 
 enum PlayerState {
 	IDLE,
@@ -22,19 +23,28 @@ enum PlayerState {
 }
 
 var current_state: PlayerState = PlayerState.IDLE
-var air_resistance: float = 50
+var previous_state: PlayerState
+var current_jump_velocity: float = JUMP_VELOCITY
+var current_air_resistance: float = 50
 var current_speed: float = SPEED
 var jump_available: bool = true
 var coyote_time: float = 0.2
 var jump_buffer: float = 0.1
 var jump_buffer_timer: float = 0.0
+var perfect_jump_time: float = 0.2
+var perfect_jump_timer: float = 0.0
+var combo_counter: int = 0
+var combo_max: int = 10
+var combo_gain: float = 10.0
+var combo_air_resistance: float = 10
+var can_combo: bool = false
 
 # DEBUGGING
 @onready var trail: Line2D = $Trail
 var max_points: int = 50 # trail max points before removing the last one
 
 # shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
-@export var jump_height: float =( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
+@export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
 
 
 func calculate_states() -> void:
@@ -50,6 +60,7 @@ func calculate_states() -> void:
 			change_state(PlayerState.JUMPING)
 
 func change_state(new_state: PlayerState):
+	previous_state = current_state
 	if new_state == current_state:
 		return
 	current_state = new_state
@@ -83,23 +94,23 @@ func get_input() -> void:
 		velocity.y = MAX_FALL_SPEED
 
 func jump() -> void:
+	# has to be first in function
+	if is_on_floor():
+		jump_available = true
+
 	# small jumps when jump button is released earlier
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= DIMINISHING_JUMP_VELOCITY
 	
+	# normal jump or jump buffered jump
 	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and jump_buffer_timer > 0:
-		velocity.y = JUMP_VELOCITY
+		velocity.y = - current_jump_velocity
 		coyote_timeout()
-		jump_buffer_timer = 0
-
-func handle_jump_availability() -> void:
-	if is_on_floor():
-		jump_available = true
 
 func apply_air_resistance() -> void:
 	velocity.x = 0
 	if not is_on_floor(): 
-		current_speed = SPEED - air_resistance
+		current_speed = SPEED - current_air_resistance
 	else: 
 		current_speed = SPEED
 
@@ -117,7 +128,7 @@ func handle_gravity(delta: float) -> void:
 	# normal gravity applied when jumping
 	else: velocity.y += GRAVITY * delta
 		
-	# keeps falling speed between JUMP_VELOCITY and MAX_FALL_SPEED
+	# caps velocity at MAX_FALL_SPEED
 	if velocity.y > MAX_FALL_SPEED:
 		velocity.y = MAX_FALL_SPEED
 	
@@ -137,21 +148,47 @@ func coyote_timeout() -> void:
 	jump_available = false
 
 func update_debug_label() -> void:
-	debug_label.text = "jump available: %s\nstate: %s" % [jump_available, PlayerState.keys()[current_state]]
+	debug_label.text = "jump available: %s\ncurrent velocity: %s\ncombo: %s" % [jump_available, current_jump_velocity, combo_counter]
 
-func handle_jump_buffer(delta: float) -> void:
+func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer 
-	jump_buffer_timer -= delta
+
+func handle_perfect_jump() -> void:
+	# starts combo timer
+	if is_on_floor() and previous_state in [PlayerState.JUMPING, PlayerState.FALLING]:
+		perfect_jump_timer = perfect_jump_time
+		can_combo = true
+	# when combo successful
+	if current_state == PlayerState.JUMPING and perfect_jump_timer > 0 and can_combo:
+		gpu_particles_2d.restart()
+		if combo_counter < combo_max:
+			combo_counter += 1
+			current_jump_velocity += combo_gain
+		can_combo = false
+	# when missing the combo
+	if is_on_floor() and perfect_jump_timer <= 0:
+		combo_counter = 0
+		current_jump_velocity = JUMP_VELOCITY
+	# changes air resistance if max combo is reached
+	if combo_counter == 10:
+		current_air_resistance = combo_air_resistance
+	else: current_air_resistance = AIR_RESISTANCE
+
+func handle_timers(delta: float) -> void:
+	if perfect_jump_timer > 0:
+		perfect_jump_timer -= delta
+	if jump_buffer_timer > 0:
+		jump_buffer_timer -= delta
 
 func _physics_process(delta: float) -> void:
 	handle_gravity(delta)
-	handle_jump_buffer(delta)
+	handle_timers(delta)
+	handle_jump_buffer()
+	handle_perfect_jump()
 	get_input()
 	move_and_slide()
 	calculate_states()
-	handle_jump_availability()
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
-	
