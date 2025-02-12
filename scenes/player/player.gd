@@ -4,7 +4,7 @@ const SPEED: float = 150.0
 const JUMP_VELOCITY: float = 360.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
 const GRAVITY: float = 1000.0 
-const FALLING_GRAVITY: float = 1500.0
+const FALLING_GRAVITY: float = 1200.0
 const MAX_FALL_SPEED: float = 400.0
 const APEX_THRESHOLD: int = 25
 const APEX_GRAVITY_MODIFIER: float = 0.5
@@ -45,6 +45,9 @@ var max_points: int = 50 # trail max points before removing the last one
 
 # shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
 @export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
+
+var no_clip: bool = false
+var no_clip_speed: float = 200.0
 
 
 func calculate_states() -> void:
@@ -181,7 +184,31 @@ func handle_timers(delta: float) -> void:
 	if jump_buffer_timer > 0:
 		jump_buffer_timer -= delta
 
+func handle_no_clip() -> void:
+	if Input.is_action_just_pressed("debug"):
+		no_clip = !no_clip
+	if no_clip:
+		collision_mask = 0
+		velocity = Vector2()
+		if Input.is_action_pressed("right"):
+			velocity.x += no_clip_speed
+		if Input.is_action_pressed("left"):
+			velocity.x -= no_clip_speed
+		if Input.is_action_pressed("jump"):
+			velocity.y -= no_clip_speed
+		if Input.is_action_pressed("down"):
+			velocity.y += no_clip_speed
+		move_and_slide()
+	if not no_clip:
+		collision_mask = 1
+		
 func _physics_process(delta: float) -> void:
+	if  no_clip:
+		process_no_clip(delta)
+	else:
+		process_normal(delta)
+
+func process_normal(delta:float) -> void:
 	handle_gravity(delta)
 	handle_timers(delta)
 	handle_jump_buffer()
@@ -192,3 +219,7 @@ func _physics_process(delta: float) -> void:
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
+	handle_no_clip()
+
+func process_no_clip(delta: float) -> void:
+	handle_no_clip()
