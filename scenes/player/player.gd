@@ -25,7 +25,9 @@ var current_state: PlayerState = PlayerState.IDLE
 var air_resistance: float = 30
 var current_speed: float = SPEED
 var jump_available: bool = true
-var coyote_time: float = 0.3
+var coyote_time: float = 0.2
+var jump_buffer: float = 0.1
+var jump_buffer_timer: float = 0.0
 
 # DEBUGGING
 @onready var trail: Line2D = $Trail
@@ -81,9 +83,10 @@ func jump() -> void:
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= DIMINISHING_JUMP_VELOCITY
 	
-	if Input.is_action_just_pressed("jump") and jump_available:
+	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and jump_buffer_timer > 0:
 		velocity.y = JUMP_VELOCITY
 		coyote_timeout()
+		jump_buffer_timer = 0
 
 func handle_jump_availability() -> void:
 	if is_on_floor():
@@ -132,8 +135,14 @@ func coyote_timeout() -> void:
 func update_debug_label() -> void:
 	debug_label.text = "jump available: %s\nstate: %s" % [jump_available, PlayerState.keys()[current_state]]
 
+func handle_jump_buffer(delta: float) -> void:
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer = jump_buffer 
+	jump_buffer_timer -= delta
+
 func _physics_process(delta: float) -> void:
 	handle_gravity(delta)
+	handle_jump_buffer(delta)
 	get_input()
 	move_and_slide()
 	calculate_states()
@@ -141,3 +150,4 @@ func _physics_process(delta: float) -> void:
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
+	
