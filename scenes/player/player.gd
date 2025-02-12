@@ -3,7 +3,7 @@ extends CharacterBody2D
 const SPEED: float = 200.0
 const JUMP_VELOCITY: float = -350.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
-const GRAVITY: float = 800.0
+const GRAVITY: float = 800.0 
 const MAX_FALL_SPEED: float = 400
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
