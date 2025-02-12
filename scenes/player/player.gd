@@ -1,23 +1,18 @@
 extends CharacterBody2D
 
-const SPEED: float = 190.0
+const SPEED: float = 150.0
 const JUMP_VELOCITY: float = -360.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
-const GRAVITY: float = 1000.0
-const FALLING_GRAVITY: float = 1200.0
-const MAX_FALL_SPEED: float = 360.0
+const GRAVITY: float = 1000.0 
+const FALLING_GRAVITY: float = 1500.0
+const MAX_FALL_SPEED: float = 400.0
+const APEX_THRESHOLD = 25
+const APEX_GRAVITY_MODIFIER = 0.5
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var debug_label: Label = $DebugLabel
 @onready var coyote_timer: Timer = $CoyoteTimer
-@onready var trail: Line2D = $Trail
 
-var air_resistance: float = 90
-var current_speed: float = SPEED
-var jump_available: bool = true
-var coyote_time: float = 0.3
-
-var max_points: int = 50 # for trail debugging
 
 enum PlayerState {
 	IDLE,
@@ -27,6 +22,18 @@ enum PlayerState {
 }
 
 var current_state: PlayerState = PlayerState.IDLE
+var air_resistance: float = 30
+var current_speed: float = SPEED
+var jump_available: bool = true
+var coyote_time: float = 0.3
+
+# DEBUGGING
+@onready var trail: Line2D = $Trail
+var max_points: int = 50 # trail max points before removing the last one
+
+# shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
+@export var jump_height: float =( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
+
 
 func calculate_states() -> void:
 	if is_on_floor():
@@ -96,7 +103,7 @@ func draw_trail() -> void:
 		if trail.get_point_count() > max_points:
 			trail.remove_point(0)
 
-func handle_falling(delta: float) -> void:
+func handle_gravity(delta: float) -> void:
 	# falling gravity applied when falling
 	if current_state == PlayerState.FALLING:
 		velocity.y += FALLING_GRAVITY * delta
@@ -104,7 +111,12 @@ func handle_falling(delta: float) -> void:
 	else: velocity.y += GRAVITY * delta
 		
 	# keeps falling speed between JUMP_VELOCITY and MAX_FALL_SPEED
-	velocity.y = clampf(velocity.y, JUMP_VELOCITY, MAX_FALL_SPEED)
+	if velocity.y > MAX_FALL_SPEED:
+		velocity.y = MAX_FALL_SPEED
+	
+	# smoothens fall at apex
+	if abs(velocity.y) < APEX_THRESHOLD and current_state == PlayerState.JUMPING: 
+		velocity.y += (GRAVITY * APEX_GRAVITY_MODIFIER) * delta
 
 func handle_coyote_timer() -> void:
 	if jump_available:
@@ -121,7 +133,7 @@ func update_debug_label() -> void:
 	debug_label.text = "jump available: %s\nstate: %s" % [jump_available, PlayerState.keys()[current_state]]
 
 func _physics_process(delta: float) -> void:
-	handle_falling(delta)
+	handle_gravity(delta)
 	get_input()
 	move_and_slide()
 	calculate_states()
