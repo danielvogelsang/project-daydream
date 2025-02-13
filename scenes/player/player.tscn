@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://biq2l3gqa8yie"]
+[gd_scene load_steps=45 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
@@ -314,6 +314,13 @@ animations = [{
 radius = 6.0
 height = 15.86
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_71ub5"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+
+[sub_resource type="CurveTexture" id="CurveTexture_d03hr"]
+width = 32
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_bgs47")
 
@@ -330,14 +337,31 @@ wait_time = 2.0
 
 [node name="DebugLabel" type="Label" parent="."]
 z_index = 1
-offset_left = -50.0
-offset_top = -36.0
-offset_right = 250.0
-offset_bottom = 9.0
+offset_left = -51.0
+offset_top = -49.0
+offset_right = 249.0
+offset_bottom = -4.0
 scale = Vector2(0.335701, 0.295532)
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
 text = "TEST"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Trail" type="Line2D" parent="."]
+visible = false
+top_level = true
+position = Vector2(0, 12)
+width = 3.0
+default_color = Color(0.0941176, 1, 1, 1)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+visible = false
+position = Vector2(0, 12)
+emitting = false
+amount = 1
+process_material = SubResource("ParticleProcessMaterial_71ub5")
+texture = SubResource("CurveTexture_d03hr")
+one_shot = true
 
 [connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]
