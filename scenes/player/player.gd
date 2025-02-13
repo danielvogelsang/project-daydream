@@ -10,6 +10,7 @@ const APEX_THRESHOLD: int = 25
 const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
+
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var debug_label: Label = $DebugLabel
 @onready var coyote_timer: Timer = $CoyoteTimer

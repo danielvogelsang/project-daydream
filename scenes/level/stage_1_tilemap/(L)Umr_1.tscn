@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=4 uid="uid://dtkhlj1a2cr8x"]
+
+[ext_resource type="TileSet" uid="uid://21m3a66frqs6" path="res://tilemaps/test_tilemap.tres" id="1_62ms1"]
+
+[node name="(L)Umr_1" type="TileMapLayer"]
+tile_map_data = PackedByteArray("AAAAAAsAAAAAAAAAAAABAAsAAAAAAAAAAAAFAAgAAAAAAAAAAAAHAAMAAAAAAAAAAAAIAAMAAAAAAAAAAAAEAAkAAAAAAAAAAAAFAAUAAAAAAAAAAAAGAAQAAAAAAAAAAAAJAAIAAAAAAAAAAAAGAAgAAAAAAAAAAAA=")
+tile_set = ExtResource("1_62ms1")
