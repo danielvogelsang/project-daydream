@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
 const SPEED: float = 150.0
-const JUMP_VELOCITY: float = 360.0
+const JUMP_VELOCITY: float = 280.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
-const GRAVITY: float = 1000.0 
-const FALLING_GRAVITY: float = 1200.0
-const MAX_FALL_SPEED: float = 400.0
+const GRAVITY: float = 600.0 
+const FALLING_GRAVITY: float = 900.0
+const MAX_FALL_SPEED: float = 350.0
 const APEX_THRESHOLD: int = 25
 const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
@@ -27,25 +27,30 @@ var previous_state: PlayerState
 var current_jump_velocity: float = JUMP_VELOCITY
 var current_air_resistance: float = 50
 var current_speed: float = SPEED
-var jump_available: bool = true
+var jump_available: bool = false
 var coyote_time: float = 0.2
+# velocity at which able to stomp
+var stomp_apex: float = 20.0
+# jump buffer
 var jump_buffer: float = 0.1
 var jump_buffer_timer: float = 0.0
+# jump combo system
 var perfect_jump_time: float = 0.2
 var perfect_jump_timer: float = 0.0
 var combo_counter: int = 0
 var combo_max: int = 10
-var combo_gain: float = 10.0
-var combo_air_resistance: float = 10
+var combo_gain: float = 5.0
+var combo_air_resistance: float = 20.0
 var can_combo: bool = false
 
-# DEBUGGING
+### DEBUGGING
 @onready var trail: Line2D = $Trail
 var max_points: int = 50 # trail max points before removing the last one
 
 # shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
 @export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
 
+# no clip activates with debug button
 var no_clip: bool = false
 var no_clip_speed: float = 200.0
 
@@ -93,7 +98,7 @@ func get_input() -> void:
 	jump()
 	
 	# stomp
-	if Input.is_action_just_pressed("down"):
+	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
 		velocity.y = MAX_FALL_SPEED
 
 func jump() -> void:
@@ -135,7 +140,7 @@ func handle_gravity(delta: float) -> void:
 	if velocity.y > MAX_FALL_SPEED:
 		velocity.y = MAX_FALL_SPEED
 	
-	# smoothens fall at apex
+	# smoothens fall at apex of jump
 	if abs(velocity.y) < APEX_THRESHOLD and current_state == PlayerState.JUMPING: 
 		velocity.y += (GRAVITY * APEX_GRAVITY_MODIFIER) * delta
 
