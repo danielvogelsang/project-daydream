@@ -349,6 +349,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Trail" type="Line2D" parent="."]
+visible = false
 top_level = true
 position = Vector2(0, 12)
 width = 3.0

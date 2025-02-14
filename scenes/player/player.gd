@@ -10,25 +10,26 @@ const APEX_THRESHOLD: int = 25
 const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
-
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var debug_label: Label = $DebugLabel
 @onready var coyote_timer: Timer = $CoyoteTimer
 @onready var gpu_particles_2d: GPUParticles2D = $GPUParticles2D
 
+# state machine
 enum PlayerState {
 	IDLE,
 	JUMPING,
 	FALLING,
 	RUNNING
 }
-
 var current_state: PlayerState = PlayerState.IDLE
 var previous_state: PlayerState
+# jump behaviour
 var current_jump_velocity: float = JUMP_VELOCITY
 var current_air_resistance: float = 50
 var current_speed: float = SPEED
 var jump_available: bool = false
+# coyote time duration
 var coyote_time: float = 0.2
 # velocity at which able to stomp
 var stomp_apex: float = 20.0
@@ -43,6 +44,13 @@ var combo_max: int = 10
 var combo_gain: float = 5.0
 var combo_air_resistance: float = 20.0
 var can_combo: bool = false
+# direction change slowdown
+enum Playerdirection {LEFT, RIGHT}
+var current_direction: Playerdirection = Playerdirection.RIGHT
+var previous_direction: Playerdirection
+var slow_down: float = 0.1
+var slow_down_timer: float = 0.0
+var slow_down_multiplier: float = 0.25
 
 ### DEBUGGING
 @onready var trail: Line2D = $Trail
@@ -87,20 +95,36 @@ func change_state(new_state: PlayerState):
 
 # handles all inputs
 func get_input() -> void:
-	apply_air_resistance()
+	velocity.x = 0
 	
+	direction_change_slowdown()
 	if Input.is_action_pressed("left"):
-		velocity.x = - current_speed
-		anim_player.flip_h = true
-	elif Input.is_action_pressed("right"):
-		velocity.x = current_speed
-		anim_player.flip_h = false
+		move_left()
+	if Input.is_action_pressed("right"):
+		move_right()
 	
 	jump()
 	
 	# stomp
 	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
 		velocity.y = MAX_FALL_SPEED
+
+
+func move_left() -> void:
+	current_direction = Playerdirection.LEFT
+	# slowdown if direction has changed in air
+	if slow_down_timer > 0 and not is_on_floor():
+		velocity.x = -current_speed * slow_down_multiplier
+	else: velocity.x = -current_speed
+	anim_player.flip_h = true
+	
+func move_right() -> void:
+	current_direction = Playerdirection.RIGHT
+	# slowdown if direction has changed in air
+	if slow_down_timer > 0 and not is_on_floor():
+		velocity.x = current_speed * slow_down_multiplier
+	else: velocity.x = current_speed
+	anim_player.flip_h = false
 
 func jump() -> void:
 	# has to be first in function
@@ -116,8 +140,13 @@ func jump() -> void:
 		velocity.y = - current_jump_velocity
 		coyote_timeout()
 
+# handles direction changes and starts slowdown timer
+func direction_change_slowdown() -> void:
+	if previous_direction != current_direction:
+		slow_down_timer = slow_down
+	previous_direction = current_direction
+
 func apply_air_resistance() -> void:
-	velocity.x = 0
 	if not is_on_floor(): 
 		current_speed = SPEED - current_air_resistance
 	else: 
@@ -145,6 +174,7 @@ func handle_gravity(delta: float) -> void:
 	if abs(velocity.y) < APEX_THRESHOLD and current_state == PlayerState.JUMPING: 
 		velocity.y += (GRAVITY * APEX_GRAVITY_MODIFIER) * delta
 
+# manages coyote timer
 func handle_coyote_timer() -> void:
 	if jump_available:
 		if coyote_timer.is_stopped():
@@ -157,7 +187,7 @@ func coyote_timeout() -> void:
 	jump_available = false
 
 func update_debug_label() -> void:
-	debug_label.text = "jump available: %s\ncurrent velocity: %s\ncombo: %s" % [jump_available, current_jump_velocity, combo_counter]
+	debug_label.text = "current direction: %s\nprevious direction: %s\ntimer: %s" % [Playerdirection.keys()[current_direction], Playerdirection.keys()[previous_direction], slow_down_timer]
 
 func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
@@ -189,6 +219,8 @@ func handle_timers(delta: float) -> void:
 		perfect_jump_timer -= delta
 	if jump_buffer_timer > 0:
 		jump_buffer_timer -= delta
+	if slow_down_timer > 0:
+		slow_down_timer -= delta
 
 func handle_no_clip() -> void:
 	if Input.is_action_just_pressed("debug"):
@@ -219,6 +251,7 @@ func process_normal(delta:float) -> void:
 	handle_timers(delta)
 	handle_jump_buffer()
 	handle_perfect_jump()
+	apply_air_resistance()
 	get_input()
 	move_and_slide()
 	calculate_states()
