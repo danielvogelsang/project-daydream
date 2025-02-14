@@ -11,9 +11,9 @@ const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
-@onready var debug_label: Label = $DebugLabel
+
 @onready var coyote_timer: Timer = $CoyoteTimer
-@onready var gpu_particles_2d: GPUParticles2D = $GPUParticles2D
+
 
 # state machine
 enum PlayerState {
@@ -32,7 +32,7 @@ var jump_available: bool = false
 # coyote time duration
 var coyote_time: float = 0.2
 # velocity at which able to stomp
-var stomp_apex: float = 20.0
+var stomp_apex: float = 30.0
 # jump buffer
 var jump_buffer: float = 0.1
 var jump_buffer_timer: float = 0.0
@@ -44,15 +44,19 @@ var combo_max: int = 10
 var combo_gain: float = 5.0
 var combo_air_resistance: float = 20.0
 var can_combo: bool = false
-# direction change slowdown
+# direction change midair slowdown
 enum Playerdirection {LEFT, RIGHT}
 var current_direction: Playerdirection = Playerdirection.RIGHT
 var previous_direction: Playerdirection
 var slow_down: float = 0.1
 var slow_down_timer: float = 0.0
-var slow_down_multiplier: float = 0.25
+var slow_down_multiplier: float = 0.1
+var last_x_position_on_floor: float
+var x_movement_threshold: float = 5.0
 
 ### DEBUGGING
+@onready var debug_label: Label = $DebugLabel
+@onready var gpu_particles_2d: GPUParticles2D = $GPUParticles2D
 @onready var trail: Line2D = $Trail
 var max_points: int = 50 # trail max points before removing the last one
 
@@ -62,7 +66,6 @@ var max_points: int = 50 # trail max points before removing the last one
 # no clip activates with debug button
 var no_clip: bool = false
 var no_clip_speed: float = 200.0
-
 
 func calculate_states() -> void:
 	if is_on_floor():
@@ -113,7 +116,7 @@ func get_input() -> void:
 func move_left() -> void:
 	current_direction = Playerdirection.LEFT
 	# slowdown if direction has changed in air
-	if slow_down_timer > 0 and not is_on_floor():
+	if slow_down_timer > 0:
 		velocity.x = -current_speed * slow_down_multiplier
 	else: velocity.x = -current_speed
 	anim_player.flip_h = true
@@ -121,7 +124,7 @@ func move_left() -> void:
 func move_right() -> void:
 	current_direction = Playerdirection.RIGHT
 	# slowdown if direction has changed in air
-	if slow_down_timer > 0 and not is_on_floor():
+	if slow_down_timer > 0:
 		velocity.x = current_speed * slow_down_multiplier
 	else: velocity.x = current_speed
 	anim_player.flip_h = false
@@ -140,10 +143,15 @@ func jump() -> void:
 		velocity.y = - current_jump_velocity
 		coyote_timeout()
 
-# handles direction changes and starts slowdown timer
+# handles direction changes midair and starts slowdown timer
 func direction_change_slowdown() -> void:
-	if previous_direction != current_direction:
-		slow_down_timer = slow_down
+	# saves global x position for comparison
+	if is_on_floor():
+		last_x_position_on_floor = global_position.x
+	if previous_direction != current_direction and not is_on_floor(): 
+		# ensures timer doesn't start if player doesn't move on x-axis
+		if abs(global_position.x - last_x_position_on_floor) > x_movement_threshold:
+			slow_down_timer = slow_down
 	previous_direction = current_direction
 
 func apply_air_resistance() -> void:
@@ -259,6 +267,7 @@ func process_normal(delta:float) -> void:
 	draw_trail()
 	update_debug_label()
 	handle_no_clip()
-
+	if is_on_floor():
+		last_x_position_on_floor = global_position.x
 func process_no_clip(delta: float) -> void:
 	handle_no_clip()
