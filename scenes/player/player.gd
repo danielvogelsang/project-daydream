@@ -14,7 +14,6 @@ const AIR_RESISTANCE: float = 50
 
 @onready var coyote_timer: Timer = $CoyoteTimer
 
-
 # state machine
 enum PlayerState {
 	IDLE,
@@ -53,6 +52,9 @@ var slow_down_timer: float = 0.0
 var slow_down_multiplier: float = 0.1
 var last_x_position_on_floor: float
 var x_movement_threshold: float = 5.0
+# character stretch
+var player_stretch_max: float = 0.05
+var velocity_threshold_multiplier: float = 1.2
 
 ### DEBUGGING
 @onready var debug_label: Label = $DebugLabel
@@ -111,6 +113,10 @@ func get_input() -> void:
 	# stomp
 	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
 		velocity.y = MAX_FALL_SPEED
+	
+	# noclip
+	if Input.is_action_just_pressed("debug"):
+		no_clip = !no_clip
 
 
 func move_left() -> void:
@@ -195,7 +201,7 @@ func coyote_timeout() -> void:
 	jump_available = false
 
 func update_debug_label() -> void:
-	debug_label.text = "current direction: %s\nprevious direction: %s\ntimer: %s" % [Playerdirection.keys()[current_direction], Playerdirection.keys()[previous_direction], slow_down_timer]
+	debug_label.text = "scale.y: %s\nscale.x: %s\ncurrent state: %s" % [anim_player.scale.y, anim_player.scale.x, PlayerState.keys()[current_state]]
 
 func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
@@ -222,6 +228,19 @@ func handle_perfect_jump() -> void:
 		current_air_resistance = combo_air_resistance
 	else: current_air_resistance = AIR_RESISTANCE
 
+# scales character when jumping or falling
+func scale_player() -> void:
+	# current_speed needs to be changed for timing changes
+	var velocity_factor = clamp(velocity.y / current_speed * velocity_threshold_multiplier, -1.0, 1.0)
+	if current_state == PlayerState.JUMPING:
+		anim_player.scale.y = lerp(1.0, 1.0 + player_stretch_max, abs(velocity_factor))
+		anim_player.scale.x = lerp(1.0, 1.0 - player_stretch_max, abs(velocity_factor))
+	elif current_state == PlayerState.FALLING:
+		anim_player.scale.y = lerp(1.0, 1.0 - player_stretch_max, abs(velocity_factor))
+		anim_player.scale.x = lerp(1.0, 1.0 + player_stretch_max, abs(velocity_factor))
+	else:
+		anim_player.scale = Vector2(1, 1)
+	
 func handle_timers(delta: float) -> void:
 	if perfect_jump_timer > 0:
 		perfect_jump_timer -= delta
@@ -249,7 +268,7 @@ func handle_no_clip() -> void:
 		collision_mask = 1
 		
 func _physics_process(delta: float) -> void:
-	if  no_clip:
+	if no_clip:
 		process_no_clip(delta)
 	else:
 		process_normal(delta)
@@ -262,12 +281,11 @@ func process_normal(delta:float) -> void:
 	apply_air_resistance()
 	get_input()
 	move_and_slide()
+	scale_player()
 	calculate_states()
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
-	handle_no_clip()
-	if is_on_floor():
-		last_x_position_on_floor = global_position.x
+	
 func process_no_clip(delta: float) -> void:
 	handle_no_clip()
