@@ -11,7 +11,6 @@ const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
-
 @onready var coyote_timer: Timer = $CoyoteTimer
 
 # state machine
@@ -52,7 +51,7 @@ var slow_down_timer: float = 0.0
 var slow_down_multiplier: float = 0.1
 var last_x_position_on_floor: float
 var x_movement_threshold: float = 5.0
-# character stretch
+# player stretch
 var player_stretch_max: float = 0.05
 var velocity_threshold_multiplier: float = 1.2
 
@@ -82,42 +81,25 @@ func calculate_states() -> void:
 			change_state(PlayerState.JUMPING)
 
 func change_state(new_state: PlayerState):
-	previous_state = current_state
-	if new_state == current_state:
-		return
-	current_state = new_state
+	if new_state != current_state:
+		previous_state = current_state
+		current_state = new_state
 	
-	match current_state:
-		PlayerState.IDLE:
-			anim_player.play("Idle")
-		PlayerState.RUNNING:
-			anim_player.play("Running")
-		PlayerState.JUMPING:
-			anim_player.play("Jumping")
-			trail.clear_points()
-		PlayerState.FALLING:
-			anim_player.play("Falling")
+	anim_player.play(PlayerState.keys()[current_state])
 
 # handles all inputs
 func get_input() -> void:
-	velocity.x = 0
+	# horizontal movement
+	handle_horizontal_input()
 	
-	direction_change_slowdown()
-	if Input.is_action_pressed("left"):
-		move_left()
-	if Input.is_action_pressed("right"):
-		move_right()
-	
-	jump()
+	# jump
+	handle_jump_input()
 	
 	# stomp
-	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
-		velocity.y = MAX_FALL_SPEED
+	handle_stomp_input()
 	
 	# noclip
-	if Input.is_action_just_pressed("debug"):
-		no_clip = !no_clip
-
+	handle_debug_input()
 
 func move_left() -> void:
 	current_direction = Playerdirection.LEFT
@@ -135,7 +117,15 @@ func move_right() -> void:
 	else: velocity.x = current_speed
 	anim_player.flip_h = false
 
-func jump() -> void:
+func handle_horizontal_input() -> void:
+	velocity.x = 0
+	direction_change_slowdown()
+	if Input.is_action_pressed("left"):
+		move_left()
+	if Input.is_action_pressed("right"):
+		move_right()
+
+func handle_jump_input() -> void:
 	# has to be first in function
 	if is_on_floor():
 		jump_available = true
@@ -148,6 +138,14 @@ func jump() -> void:
 	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and jump_buffer_timer > 0:
 		velocity.y = - current_jump_velocity
 		coyote_timeout()
+
+func handle_stomp_input() -> void:
+	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
+		velocity.y = MAX_FALL_SPEED
+
+func handle_debug_input() -> void:
+	if Input.is_action_just_pressed("debug"):
+		no_clip = !no_clip
 
 # handles direction changes midair and starts slowdown timer
 func direction_change_slowdown() -> void:
@@ -165,13 +163,6 @@ func apply_air_resistance() -> void:
 		current_speed = SPEED - current_air_resistance
 	else: 
 		current_speed = SPEED
-
-# debugging trail for jump visualization
-func draw_trail() -> void:
-	if not is_on_floor():
-		trail.add_point(position)
-		if trail.get_point_count() > max_points:
-			trail.remove_point(0)
 
 func handle_gravity(delta: float) -> void:
 	# falling gravity applied when falling
@@ -200,9 +191,6 @@ func handle_coyote_timer() -> void:
 func coyote_timeout() -> void:
 	jump_available = false
 
-func update_debug_label() -> void:
-	debug_label.text = "scale.y: %s\nscale.x: %s\ncurrent state: %s" % [anim_player.scale.y, anim_player.scale.x, PlayerState.keys()[current_state]]
-
 func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer 
@@ -230,7 +218,7 @@ func handle_perfect_jump() -> void:
 
 # scales character when jumping or falling
 func scale_player() -> void:
-	# current_speed needs to be changed for timing changes
+	# changes scale timing 
 	var velocity_factor = clamp(velocity.y / current_speed * velocity_threshold_multiplier, -1.0, 1.0)
 	if current_state == PlayerState.JUMPING:
 		anim_player.scale.y = lerp(1.0, 1.0 + player_stretch_max, abs(velocity_factor))
@@ -249,6 +237,20 @@ func handle_timers(delta: float) -> void:
 	if slow_down_timer > 0:
 		slow_down_timer -= delta
 
+func update_debug_label() -> void:
+	debug_label.text = "scale.y: %s\nscale.x: %s\ncurrent state: %s" % [
+		anim_player.scale.y, anim_player.scale.x, PlayerState.keys()[current_state]
+		]
+
+# debugging trail for jump visualization
+func draw_trail() -> void:
+	if not is_on_floor():
+		trail.add_point(position)
+		if trail.get_point_count() > max_points:
+			trail.remove_point(0)
+	if current_state == PlayerState.JUMPING:
+		trail.clear_points()
+		
 func handle_no_clip() -> void:
 	if Input.is_action_just_pressed("debug"):
 		no_clip = !no_clip
