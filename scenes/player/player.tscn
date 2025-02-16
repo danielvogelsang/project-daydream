@@ -332,11 +332,7 @@ animation = &"JUMPING"
 position = Vector2(0, 4.07)
 shape = SubResource("CapsuleShape2D_3ofsw")
 
-[node name="CoyoteTimer" type="Timer" parent="."]
-wait_time = 2.0
-
 [node name="DebugLabel" type="Label" parent="."]
-visible = false
 z_index = 1
 offset_left = -51.0
 offset_top = -49.0
@@ -364,5 +360,3 @@ amount = 1
 process_material = SubResource("ParticleProcessMaterial_71ub5")
 texture = SubResource("CurveTexture_d03hr")
 one_shot = true
-
-[connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]

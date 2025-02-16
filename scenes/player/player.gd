@@ -11,7 +11,6 @@ const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
-@onready var coyote_timer: Timer = $CoyoteTimer
 
 # state machine
 enum PlayerState {
@@ -22,13 +21,16 @@ enum PlayerState {
 }
 var current_state: PlayerState = PlayerState.IDLE
 var previous_state: PlayerState
+var was_in_air: bool = false
+var was_on_ground: bool = false
 # jump behaviour
 var current_jump_velocity: float = JUMP_VELOCITY
 var current_air_resistance: float = 50
 var current_speed: float = SPEED
 var jump_available: bool = false
-# coyote time duration
+# coyote time
 var coyote_time: float = 0.2
+var coyote_timer: float = 0.0
 # velocity at which able to stomp
 var stomp_apex: float = 30.0
 # jump buffer
@@ -80,6 +82,9 @@ func calculate_states() -> void:
 			change_state(PlayerState.FALLING)
 		else:
 			change_state(PlayerState.JUMPING)
+	
+	was_on_ground = previous_state in [PlayerState.IDLE, PlayerState.RUNNING]
+	was_in_air = previous_state in [PlayerState.JUMPING, PlayerState.FALLING]
 
 func change_state(new_state: PlayerState):
 	previous_state = current_state
@@ -137,7 +142,7 @@ func handle_jump_input() -> void:
 	# normal jump or jump buffered jump
 	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and jump_buffer_timer > 0:
 		velocity.y = - current_jump_velocity
-		coyote_timeout()
+		jump_available = false
 
 func handle_stomp_input() -> void:
 	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
@@ -182,14 +187,12 @@ func handle_gravity(delta: float) -> void:
 # manages coyote timer
 func handle_coyote_timer() -> void:
 	if jump_available:
-		if coyote_timer.is_stopped():
-			coyote_timer.start(coyote_time)
+		if was_on_ground:
+			coyote_timer = coyote_time
 		if is_on_floor():
-			coyote_timer.stop()
-
-# set to false after timeout
-func coyote_timeout() -> void:
-	jump_available = false
+			coyote_timer = 0
+		if coyote_timer < 0:
+			jump_available = false
 
 func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
@@ -197,7 +200,7 @@ func handle_jump_buffer() -> void:
 
 func handle_perfect_jump() -> void:
 	# starts combo timer
-	if is_on_floor() and previous_state in [PlayerState.JUMPING, PlayerState.FALLING]:
+	if is_on_floor() and was_in_air:
 		perfect_jump_timer = perfect_jump_time
 		can_combo = true
 	# when combo successful
@@ -219,26 +222,30 @@ func handle_perfect_jump() -> void:
 # scales player when jumping or landing
 func stretch_sqaush(delta: float) -> void:
 	# player stretch when jumping
-	if current_state == PlayerState.JUMPING and previous_state in [PlayerState.IDLE, PlayerState.RUNNING]:
+	if current_state == PlayerState.JUMPING and was_on_ground:
 		anim_player.scale = player_stretch
 	# player squash when landing
 	elif previous_state == PlayerState.FALLING and is_on_floor():
 		anim_player.scale = player_squash
 	# scale returning to normal
-	anim_player.scale.x = move_toward(anim_player.scale.x, 1.0, scale_back_speed * delta)
-	anim_player.scale.y = move_toward(anim_player.scale.y, 1.0, scale_back_speed * delta)
+	if anim_player.scale != Vector2(1.0, 1.0):
+		anim_player.scale = anim_player.scale.move_toward(Vector2(1.0, 1.0), scale_back_speed * delta)
 
 func handle_timers(delta: float) -> void:
-	if perfect_jump_timer > 0:
-		perfect_jump_timer -= delta
-	if jump_buffer_timer > 0:
-		jump_buffer_timer -= delta
-	if slow_down_timer > 0:
-		slow_down_timer -= delta
+	var timers = [perfect_jump_timer, jump_buffer_timer, slow_down_timer, coyote_timer]
+	# countdown timer
+	for i in range(timers.size()):
+		if timers[i] > 0:
+			timers[i] -= delta
+	# update timer (kinda ugly)
+	perfect_jump_timer = timers[0]
+	jump_buffer_timer = timers[1]
+	slow_down_timer = timers[2]
+	coyote_timer = timers[3]
 
 func update_debug_label() -> void:
-	debug_label.text = "scale.y: %s\nscale.x: %s\ncurrent state: %s" % [
-		anim_player.scale.y, anim_player.scale.x, PlayerState.keys()[current_state]
+	debug_label.text = "jump availabe: %s\ntimer: %s\ncurrent state: %s" % [
+		jump_available, coyote_timer, PlayerState.keys()[current_state]
 		]
 
 # debugging trail for jump visualization
