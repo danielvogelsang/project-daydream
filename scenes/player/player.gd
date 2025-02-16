@@ -51,9 +51,10 @@ var slow_down_timer: float = 0.0
 var slow_down_multiplier: float = 0.1
 var last_x_position_on_floor: float
 var x_movement_threshold: float = 5.0
-# player stretch
-var player_stretch_max: float = 0.05
-var velocity_threshold_multiplier: float = 1.2
+# player stretch and squash
+var player_stretch: Vector2 = Vector2(0.6, 1.4)
+var player_squash: Vector2 = Vector2(1.2, 0.8)
+var scale_back_speed: float = 3.0
 
 ### DEBUGGING
 @onready var debug_label: Label = $DebugLabel
@@ -81,10 +82,9 @@ func calculate_states() -> void:
 			change_state(PlayerState.JUMPING)
 
 func change_state(new_state: PlayerState):
+	previous_state = current_state
 	if new_state != current_state:
-		previous_state = current_state
 		current_state = new_state
-	
 	anim_player.play(PlayerState.keys()[current_state])
 
 # handles all inputs
@@ -216,19 +216,18 @@ func handle_perfect_jump() -> void:
 		current_air_resistance = combo_air_resistance
 	else: current_air_resistance = AIR_RESISTANCE
 
-# scales character when jumping or falling
-func scale_player() -> void:
-	# changes scale timing 
-	var velocity_factor = clamp(velocity.y / current_speed * velocity_threshold_multiplier, -1.0, 1.0)
-	if current_state == PlayerState.JUMPING:
-		anim_player.scale.y = lerp(1.0, 1.0 + player_stretch_max, abs(velocity_factor))
-		anim_player.scale.x = lerp(1.0, 1.0 - player_stretch_max, abs(velocity_factor))
-	elif current_state == PlayerState.FALLING:
-		anim_player.scale.y = lerp(1.0, 1.0 - player_stretch_max, abs(velocity_factor))
-		anim_player.scale.x = lerp(1.0, 1.0 + player_stretch_max, abs(velocity_factor))
-	else:
-		anim_player.scale = Vector2(1, 1)
-	
+# scales player when jumping or landing
+func stretch_sqaush(delta: float) -> void:
+	# player stretch when jumping
+	if current_state == PlayerState.JUMPING and previous_state in [PlayerState.IDLE, PlayerState.RUNNING]:
+		anim_player.scale = player_stretch
+	# player squash when landing
+	elif previous_state == PlayerState.FALLING and is_on_floor():
+		anim_player.scale = player_squash
+	# scale returning to normal
+	anim_player.scale.x = move_toward(anim_player.scale.x, 1.0, scale_back_speed * delta)
+	anim_player.scale.y = move_toward(anim_player.scale.y, 1.0, scale_back_speed * delta)
+
 func handle_timers(delta: float) -> void:
 	if perfect_jump_timer > 0:
 		perfect_jump_timer -= delta
@@ -283,11 +282,11 @@ func process_normal(delta:float) -> void:
 	apply_air_resistance()
 	get_input()
 	move_and_slide()
-	scale_player()
+	stretch_sqaush(delta)
 	calculate_states()
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
-	
+
 func process_no_clip(delta: float) -> void:
 	handle_no_clip()
