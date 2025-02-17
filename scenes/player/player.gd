@@ -52,6 +52,7 @@ var slow_down: float = 0.1
 var slow_down_timer: float = 0.0
 var slow_down_multiplier: float = 0.1
 var last_x_position_on_floor: float
+var last_y_position_on_floor: float
 var x_movement_threshold: float = 5.0
 # player stretch and squash
 var player_stretch: Vector2 = Vector2(0.6, 1.4)
@@ -59,17 +60,21 @@ var player_squash: Vector2 = Vector2(1.2, 0.8)
 var scale_back_speed: float = 3.0
 
 ### DEBUGGING
+# label
 @onready var debug_label: Label = $DebugLabel
-@onready var gpu_particles_2d: GPUParticles2D = $GPUParticles2D
+var is_debug_label: bool = false
+# trail
 @onready var trail: Line2D = $Trail
-var max_points: int = 50 # trail max points before removing the last one
+var max_points: int = 100 
+# no clip activates with debug button
+var is_no_clip: bool = false
+var no_clip_speed: float = 200.0
+# quick respawn
+@export var quick_respawn: bool = false
+var respawn_window: float = 200
 
 # shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
-@export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
-
-# no clip activates with debug button
-var no_clip: bool = false
-var no_clip_speed: float = 200.0
+# @export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
 
 func calculate_states() -> void:
 	if is_on_floor():
@@ -85,6 +90,9 @@ func calculate_states() -> void:
 	
 	was_on_ground = previous_state in [PlayerState.IDLE, PlayerState.RUNNING]
 	was_in_air = previous_state in [PlayerState.JUMPING, PlayerState.FALLING]
+	# kind of a state thing, not really though
+	if not is_no_clip:
+		collision_mask = 1
 
 func change_state(new_state: PlayerState):
 	previous_state = current_state
@@ -102,9 +110,6 @@ func get_input() -> void:
 	
 	# stomp
 	handle_stomp_input()
-	
-	# noclip
-	handle_debug_input()
 
 func move_left() -> void:
 	current_direction = Playerdirection.LEFT
@@ -148,15 +153,12 @@ func handle_stomp_input() -> void:
 	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
 		velocity.y = MAX_FALL_SPEED
 
-func handle_debug_input() -> void:
-	if Input.is_action_just_pressed("debug"):
-		no_clip = !no_clip
-
 # handles direction changes midair and starts slowdown timer
 func direction_change_slowdown() -> void:
 	# saves global x position for comparison
 	if is_on_floor():
 		last_x_position_on_floor = global_position.x
+		last_y_position_on_floor = global_position.y
 	if previous_direction != current_direction and not is_on_floor(): 
 		# ensures timer doesn't start if player doesn't move on x-axis
 		if abs(global_position.x - last_x_position_on_floor) > x_movement_threshold:
@@ -205,7 +207,6 @@ func handle_perfect_jump() -> void:
 		can_combo = true
 	# when combo successful
 	if current_state == PlayerState.JUMPING and perfect_jump_timer > 0 and can_combo:
-		gpu_particles_2d.restart()
 		if combo_counter < combo_max:
 			combo_counter += 1
 			current_jump_velocity += combo_gain
@@ -244,9 +245,12 @@ func handle_timers(delta: float) -> void:
 	coyote_timer = timers[3]
 
 func update_debug_label() -> void:
-	debug_label.text = "jump availabe: %s\ntimer: %s\ncurrent state: %s" % [
-		jump_available, coyote_timer, PlayerState.keys()[current_state]
-		]
+	if is_debug_label:
+		debug_label.show()
+		debug_label.text = "jump availabe: %s\ntimer: %s\nmask: %s" % [
+			jump_available, coyote_timer, collision_mask
+			]
+	else: debug_label.hide()
 
 # debugging trail for jump visualization
 func draw_trail() -> void:
@@ -258,9 +262,7 @@ func draw_trail() -> void:
 		trail.clear_points()
 		
 func handle_no_clip() -> void:
-	if Input.is_action_just_pressed("debug"):
-		no_clip = !no_clip
-	if no_clip:
+	if is_no_clip:
 		collision_mask = 0
 		velocity = Vector2()
 		if Input.is_action_pressed("right"):
@@ -272,11 +274,16 @@ func handle_no_clip() -> void:
 		if Input.is_action_pressed("down"):
 			velocity.y += no_clip_speed
 		move_and_slide()
-	if not no_clip:
-		collision_mask = 1
-		
+	
+
+func handle_quick_respawn() -> void:
+	if quick_respawn:
+		if last_y_position_on_floor:
+			if position.y > last_y_position_on_floor + respawn_window:
+				position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+
 func _physics_process(delta: float) -> void:
-	if no_clip:
+	if is_no_clip:
 		process_no_clip(delta)
 	else:
 		process_normal(delta)
@@ -294,6 +301,7 @@ func process_normal(delta:float) -> void:
 	handle_coyote_timer()
 	draw_trail()
 	update_debug_label()
+	handle_quick_respawn()
 
 func process_no_clip(delta: float) -> void:
 	handle_no_clip()
