@@ -56,25 +56,35 @@ func check_collapse_status():
 func collapse_at(coords: Vector2):
 	var keys = wave_function[coords.y][coords.x].keys()
 	#print(wave_function[coords.y][coords.x])
+	#if keys.size() == 0:
+		#return
+	#else:
 	var random_key = keys[randi() % keys.size()]
 	for tile in wave_function[coords.y][coords.x].keys():
 		if tile == random_key:
 			continue
 		else:
 			wave_function[coords.y][coords.x].erase(tile)
-	print(random_key)
+	#print(random_key)
 	#print("collapse at " + str(wave_function[coords.y][coords.x]))
 	#valid_directions(coords)
 	#propagate(coords)
-	
-		
+func first_collapse(coords: Vector2):
+	var keys = wave_function[coords.y][coords.x].keys()
+	var first_key = "tile_19"
+	for tile in wave_function[coords.y][coords.x].keys():
+		if tile == first_key:
+			continue
+		else:
+			wave_function[coords.y][coords.x].erase(tile)
+
 func get_possibilities(_coords):
 	var module = wave_function[_coords.y][_coords.x]
 	if len(module) == 1:
 		return [0]
 		print("collapsed already")
 	else:
-		print(wave_function[_coords.y][_coords.x].keys())
+		#print(wave_function[_coords.y][_coords.x].keys())
 		return(wave_function[_coords.y][_coords.x].keys())
 
 func valid_directions(_coords):
@@ -160,7 +170,7 @@ func get_possible_neighbours(_coords, d):
 							if !list_of_neighbours.has(new_tile):
 								list_of_neighbours.append(new_tile)
 								
-	print("Die Liste der potentiellen Nachbarn ist: ", list_of_neighbours)
+	#print("Die Liste der potentiellen Nachbarn ist: ", list_of_neighbours)
 	return list_of_neighbours
 
 func is_collapsed():
@@ -170,10 +180,11 @@ func iterate():
 	var coords
 	if first_iteration == false:
 		coords = get_min_entropy_coords()
+		await collapse_at(coords)
 	else:
-		coords = Vector2((size.x * 0.5), 0)
+		coords = Vector2(((size.x * 0.5)), 0)
 		first_iteration = false
-	await collapse_at(coords)
+		await first_collapse(coords)
 	#print(wave_function[coords.y][coords.x].keys())
 	propagate(coords)
 	if check_collapse_status():
@@ -183,16 +194,19 @@ func iterate():
 func constrain(_coords, tile_name):
 	var module = wave_function[_coords.y][_coords.x]
 	module.erase(tile_name)
-	print("cut ", tile_name)
+	#print("cut ", tile_name)
 	
 func propagate(_coords):
 	stack.append(_coords)
 	while len(stack) > 0:
 		var cur_coords = stack.pop_back()
-		print("new", cur_coords)
+		stack.shuffle()
+		if !stack.is_empty():
+			cur_coords = stack[0]
+		#print("new", cur_coords)
 		for d in valid_directions(cur_coords):
 			var other_coords = cur_coords + d
-			print(d,other_coords)
+			#print(d,other_coords)
 			var other_possible_prototypes = get_possibilities(other_coords).duplicate()
 			var possible_neighbours = get_possible_neighbours(cur_coords, d).duplicate()
 			#print("other_prototypes are", other_possible_prototypes)
@@ -205,10 +219,13 @@ func propagate(_coords):
 				if not other_prototype in possible_neighbours:
 					constrain(other_coords, other_prototype)
 					var module = wave_function[other_coords.y][other_coords.x]
-					if module.keys() == []:
+					if module.keys().is_empty():
 						module["tile_31"] = all_prototypes["tile_31"].duplicate()
+						stack.erase(other_coords)
 						continue
-					if not other_coords in stack:
-						stack.append(other_coords)
+						if not other_coords in stack:
+							stack.append(other_coords)
 						
-			
+			#if !wave_function[other_coords.y][other_coords.x].keys() == ["tile_31"]:
+				#if not other_coords in stack:
+						#stack.append(other_coords)
