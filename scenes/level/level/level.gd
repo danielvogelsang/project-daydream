@@ -1,17 +1,17 @@
 extends Node2D
 
 #@onready var tilemap = $TileMapLayer
-@onready var player = $Player
+@onready var player_scene = preload("res://scenes/player/player.tscn")
 @onready var camera = $Camera2D
 @onready var level_generator = $Level_generator
-@export var max_y = 1000
-
+@export var max_y = 250
+var player
 var x_generation_distance = 50
 var x_spacing = 3
 var y_spacing = 4
 var starting_x
 var starting_y
-
+var level_size = Vector2()
 #func generate_level():
 	#for i in 100:
 		#if i == 50:
@@ -32,14 +32,31 @@ func reset_player():
 	camera.position.x = player.position.x
 	camera.position.y = player.position.y
 	
+func _on_generation_done():
+	inst_player()
+func inst_player():
+	var instance = player_scene.instantiate()
+	instance.name = "Player"
+	player = instance
+	reset_player()
+	add_child(instance)
+	camera.player_position = instance.position
+	camera.current_mode = camera.camera_mode.PLAYER
+	
+	
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#generate_level()
-	starting_x = level_generator.size.x * 0.5 * 192
+	level_size.x = level_generator.size.x * 192
+	level_size.y = level_generator.size.y * 192
+	starting_x = (level_generator.size.x * 0.5 * 192) + 96
 	starting_y = 0
+	camera.center_of_map.x = level_size.x * 0.5
+	camera.center_of_map.y = level_size.y * -0.5
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if player.position.y > max_y:
-		reset_player()
+	if has_node("Player"):
+		if player.position.y > max_y:
+			reset_player()

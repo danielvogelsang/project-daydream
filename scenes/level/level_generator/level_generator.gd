@@ -412,6 +412,7 @@ var module
 var meshes
 var all_tiles  = {
 }
+signal generation_done
 
 func create_all_prototypes_dictionary():
 	for i in range(1,32):
@@ -437,8 +438,6 @@ func visualize_wave_function():
 			#print(x,y,prototype["tile"])
 			for tile in prototype:
 				print(x,y,tile)
-				if tile == "tile_31":
-					continue
 				var instance = load(prototype[tile]["tile"]).instantiate()
 				if prototype[tile]["rotation_y"]:
 					instance.scale.x *= -1
@@ -446,7 +445,15 @@ func visualize_wave_function():
 				instance.position.y -= y * 192
 				instance.position.x += x * 192
 				add_child(instance)
+				#var debug_text = load("res://scenes/level/level_generator/debug_text/debug_text.tscn").instantiate()
+				#debug_text.text = JSON.stringify(tile)
+				#if instance.scale.x == -1:
+					#debug_text.scale.x *= -1
+				#debug_text.position.x += x + 96
+				#debug_text.position.y -= y - 96
+				#instance.add_child(debug_text)
 	print("WF fertig!")
+	generation_done.emit()
 				
 func iterate_when_not_collapsed():
 	while not wfc.is_collapsed():
@@ -455,6 +462,7 @@ func iterate_when_not_collapsed():
 	visualize_wave_function()
 
 func _ready() -> void:
+	generation_done.connect(get_parent()._on_generation_done)
 	create_all_prototypes_dictionary()
 	var instance_wfc = wfc.initialize(size, all_tiles)
 	#add_child(instance_wfc)
