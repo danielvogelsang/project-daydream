@@ -16,10 +16,10 @@ shape = SubResource("RectangleShape2D_emddi")
 
 [node name="ItemDescription" type="Label" parent="."]
 offset_left = -22.0
-offset_top = -17.0
+offset_top = -28.0
 offset_right = 614.0
-offset_bottom = 126.0
-scale = Vector2(0.0691935, 0.0420282)
+offset_bottom = 210.0
+scale = Vector2(0.0691935, 0.0820282)
 theme_override_font_sizes/font_size = 60
 text = "test"
 horizontal_alignment = 1

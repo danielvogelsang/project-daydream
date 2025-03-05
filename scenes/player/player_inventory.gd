@@ -4,12 +4,12 @@ class_name PlayerInventory
 var items: Array[ItemData] = []
 var item_effects: Dictionary = {}
 
-@onready var ui_layout: VBoxContainer = $CanvasLayer/VBoxContainer
+@onready var ui_layout: VBoxContainer = $CanvasLayer/MarginContainer/VBoxContainer
 
 func add_item(new_item: ItemData) -> void:
 	items.append(new_item)
 	apply_item_effect(new_item)
-	destroy_other_items()
+	#destroy_other_items()
 	draw_inventory()
 
 func apply_item_effect(item: ItemData) -> void:
@@ -24,6 +24,10 @@ func destroy_other_items() -> void:
 		pickup.queue_free()
 
 func draw_inventory() -> void:
+	# remove already drawn items to avoid duplicates
+	for child in ui_layout.get_children():
+		child.queue_free()
+	
 	for i in items.size():
 		var texture_rect := TextureRect.new()
 		texture_rect.texture = items[i].get_icon()

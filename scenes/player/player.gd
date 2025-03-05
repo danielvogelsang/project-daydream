@@ -16,6 +16,7 @@ enum PlayerState {
 	FALLING,
 	RUNNING
 }
+
 var current_state: PlayerState = PlayerState.IDLE
 var previous_state: PlayerState
 var was_in_air: bool = false
@@ -141,7 +142,6 @@ func handle_horizontal_input() -> void:
 		move_left()
 	elif input_direction > 0:
 		move_right()
-
 
 func handle_jump_input() -> void:
 	# has to be first in function
@@ -280,6 +280,12 @@ func handle_quick_respawn() -> void:
 			if position.y > last_y_position_on_floor + respawn_window:
 				position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
 
+func debugging() -> void:
+	draw_trail()
+	update_debug_label()
+	handle_quick_respawn()
+	
+
 func _physics_process(delta: float) -> void:
 	if is_no_clip:
 		process_no_clip(delta)
@@ -297,9 +303,7 @@ func process_normal(delta:float) -> void:
 	stretch_sqaush(delta)
 	calculate_states()
 	handle_coyote_timer()
-	draw_trail()
-	update_debug_label()
-	handle_quick_respawn()
+	debugging()
 
 func process_no_clip(_delta: float) -> void:
 	handle_no_clip()

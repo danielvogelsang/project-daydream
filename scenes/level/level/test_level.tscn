@@ -10,7 +10,6 @@
 
 [node name="Player" parent="." instance=ExtResource("1_pdo7u")]
 position = Vector2(618, 1024)
-is_debug_label = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
