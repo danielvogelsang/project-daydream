@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scenes/level/level/camera/Camera2D.gd" id="2_xui6b"]
 [ext_resource type="TileSet" uid="uid://21m3a66frqs6" path="res://tilemaps/test_tilemap.tres" id="3_256ua"]
 [ext_resource type="PackedScene" uid="uid://buelbnflaioii" path="res://scenes/debug/debug_menu.tscn" id="4_ny1k2"]
-[ext_resource type="PackedScene" uid="uid://c2i5niiup03v4" path="res://scenes/items/itempool.tscn" id="5_7rww8"]
+[ext_resource type="PackedScene" uid="uid://c2i5niiup03v4" path="res://scenes/itemsystem/itempool.tscn" id="5_7rww8"]
 
 [node name="TestLevel" type="Node2D"]
 

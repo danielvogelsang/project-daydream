@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2i5niiup03v4"]
+
+[ext_resource type="Script" path="res://scenes/itemsystem/itempool.gd" id="1_hmbqa"]
+
+[node name="Itempool" type="Node2D"]
+script = ExtResource("1_hmbqa")

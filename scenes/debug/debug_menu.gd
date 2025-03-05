@@ -17,7 +17,7 @@ func _ready() -> void:
 	
 	update_menu()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("debug"):
 		visible = !visible
 	if player:
