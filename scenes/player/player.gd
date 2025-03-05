@@ -1,16 +1,13 @@
 extends CharacterBody2D
 
-const SPEED: float = 150.0
-const JUMP_VELOCITY: float = 280.0
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
 const GRAVITY: float = 600.0 
 const FALLING_GRAVITY: float = 900.0
 const MAX_FALL_SPEED: float = 350.0
-const APEX_THRESHOLD: int = 25
-const APEX_GRAVITY_MODIFIER: float = 0.5
 const AIR_RESISTANCE: float = 50
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
+@onready var player_inventory: PlayerInventory = $PlayerInventory
 
 # state machine
 enum PlayerState {
@@ -23,22 +20,22 @@ var current_state: PlayerState = PlayerState.IDLE
 var previous_state: PlayerState
 var was_in_air: bool = false
 var was_on_ground: bool = false
+# movement
+var jump_velocity: float = 280.0
+var speed: float = 150.0
 # jump behaviour
-var current_jump_velocity: float = JUMP_VELOCITY
+var current_jump_velocity: float = jump_velocity
 var current_air_resistance: float = 50
-var current_speed: float = SPEED
+var current_speed: float = speed
 var jump_available: bool = false
 # coyote time
 var coyote_time: float = 0.2
-var coyote_timer: float = 0.0
 # velocity at which able to stomp
 var stomp_apex: float = 30.0
 # jump buffer
 var jump_buffer: float = 0.1
-var jump_buffer_timer: float = 0.0
 # jump combo system
 var perfect_jump_time: float = 0.2
-var perfect_jump_timer: float = 0.0
 var combo_counter: int = 0
 var combo_max: int = 10
 var combo_gain: float = 5.0
@@ -48,9 +45,9 @@ var can_combo: bool = false
 enum Playerdirection {LEFT, RIGHT}
 var current_direction: Playerdirection = Playerdirection.RIGHT
 var previous_direction: Playerdirection
-var slow_down: float = 0.1
-var slow_down_timer: float = 0.0
-var slow_down_multiplier: float = 0.1
+# slowdown midair
+var slow_down: float = 0.15
+var slow_down_multiplier: float = 0.5
 var last_x_position_on_floor: float
 var last_y_position_on_floor: float
 var x_movement_threshold: float = 5.0
@@ -59,22 +56,29 @@ var player_stretch: Vector2 = Vector2(0.6, 1.4)
 var player_squash: Vector2 = Vector2(1.2, 0.8)
 var scale_back_speed: float = 3.0
 
+var timers: Dictionary = {
+	"perfect_jump": 0.0,
+	"jump_buffer": 0.0,
+	"slow_down": 0.0,
+	"coyote": 0.0
+}
+
 ### DEBUGGING
 # label
 @onready var debug_label: Label = $DebugLabel
-var is_debug_label: bool = false
+@export var is_debug_label: bool = false
 # trail
 @onready var trail: Line2D = $Trail
 var max_points: int = 100 
 # no clip activates with debug button
-var is_no_clip: bool = false
+@export var is_no_clip: bool = false
 var no_clip_speed: float = 200.0
 # quick respawn
 @export var quick_respawn: bool = false
 var respawn_window: float = 200
 
 # shows jump height in blocks (16 pixels each), not for setting jump height, ignores apex slowdown
-# @export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
+#@export var jump_height: float = ( (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY) ) / 16
 
 func calculate_states() -> void:
 	if is_on_floor():
@@ -114,26 +118,30 @@ func get_input() -> void:
 func move_left() -> void:
 	current_direction = Playerdirection.LEFT
 	# slowdown if direction has changed in air
-	if slow_down_timer > 0:
-		velocity.x = -current_speed * slow_down_multiplier
+	if timers["slow_down"] > 0:
+		velocity.x *= slow_down_multiplier
 	else: velocity.x = -current_speed
 	anim_player.flip_h = true
 	
 func move_right() -> void:
 	current_direction = Playerdirection.RIGHT
 	# slowdown if direction has changed in air
-	if slow_down_timer > 0:
-		velocity.x = current_speed * slow_down_multiplier
+	if timers["slow_down"] > 0:
+		velocity.x *= slow_down_multiplier
 	else: velocity.x = current_speed
 	anim_player.flip_h = false
 
 func handle_horizontal_input() -> void:
-	velocity.x = 0
 	direction_change_slowdown()
-	if Input.is_action_pressed("left"):
+	
+	var input_direction: float = Input.get_axis("left", "right")
+	velocity.x = input_direction * current_speed
+	
+	if input_direction < 0:
 		move_left()
-	if Input.is_action_pressed("right"):
+	elif input_direction > 0:
 		move_right()
+
 
 func handle_jump_input() -> void:
 	# has to be first in function
@@ -145,7 +153,7 @@ func handle_jump_input() -> void:
 		velocity.y *= DIMINISHING_JUMP_VELOCITY
 	
 	# normal jump or jump buffered jump
-	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and jump_buffer_timer > 0:
+	if Input.is_action_just_pressed("jump") and jump_available or is_on_floor() and timers["jump_buffer"] > 0:
 		velocity.y = - current_jump_velocity
 		jump_available = false
 
@@ -162,14 +170,14 @@ func direction_change_slowdown() -> void:
 	if previous_direction != current_direction and not is_on_floor(): 
 		# ensures timer doesn't start if player doesn't move on x-axis
 		if abs(global_position.x - last_x_position_on_floor) > x_movement_threshold:
-			slow_down_timer = slow_down
+			timers["slow_down"] = slow_down
 	previous_direction = current_direction
 
 func apply_air_resistance() -> void:
 	if not is_on_floor(): 
-		current_speed = SPEED - current_air_resistance
+		current_speed = speed - current_air_resistance
 	else: 
-		current_speed = SPEED
+		current_speed = speed
 
 func handle_gravity(delta: float) -> void:
 	# falling gravity applied when falling
@@ -179,42 +187,37 @@ func handle_gravity(delta: float) -> void:
 	else: velocity.y += GRAVITY * delta
 		
 	# caps velocity at MAX_FALL_SPEED
-	if velocity.y > MAX_FALL_SPEED:
-		velocity.y = MAX_FALL_SPEED
-	
-	# smoothens fall at apex of jump
-	if abs(velocity.y) < APEX_THRESHOLD and current_state == PlayerState.JUMPING: 
-		velocity.y += (GRAVITY * APEX_GRAVITY_MODIFIER) * delta
+	velocity.y = min(velocity.y, MAX_FALL_SPEED)
 
 # manages coyote timer
 func handle_coyote_timer() -> void:
 	if jump_available:
 		if was_on_ground:
-			coyote_timer = coyote_time
+			timers["coyote"] = coyote_time
 		if is_on_floor():
-			coyote_timer = 0
-		if coyote_timer < 0:
+			timers["coyote"] = 0
+		if timers["coyote"] < 0:
 			jump_available = false
 
 func handle_jump_buffer() -> void:
 	if Input.is_action_just_pressed("jump"):
-		jump_buffer_timer = jump_buffer 
+		timers["jump_buffer"] = jump_buffer 
 
 func handle_perfect_jump() -> void:
 	# starts combo timer
 	if is_on_floor() and was_in_air:
-		perfect_jump_timer = perfect_jump_time
+		timers["perfect_jump"] = perfect_jump_time
 		can_combo = true
 	# when combo successful
-	if current_state == PlayerState.JUMPING and perfect_jump_timer > 0 and can_combo:
+	if current_state == PlayerState.JUMPING and timers["perfect_jump"] > 0 and can_combo:
 		if combo_counter < combo_max:
 			combo_counter += 1
 			current_jump_velocity += combo_gain
 		can_combo = false
 	# when missing the combo
-	if is_on_floor() and perfect_jump_timer <= 0:
+	if is_on_floor() and timers["perfect_jump"] <= 0:
 		combo_counter = 0
-		current_jump_velocity = JUMP_VELOCITY
+		current_jump_velocity = jump_velocity
 	# changes air resistance if max combo is reached
 	if combo_counter == 10:
 		current_air_resistance = combo_air_resistance
@@ -233,22 +236,17 @@ func stretch_sqaush(delta: float) -> void:
 		anim_player.scale = anim_player.scale.move_toward(Vector2(1.0, 1.0), scale_back_speed * delta)
 
 func handle_timers(delta: float) -> void:
-	var timers = [perfect_jump_timer, jump_buffer_timer, slow_down_timer, coyote_timer]
-	# countdown timer
-	for i in range(timers.size()):
-		if timers[i] > 0:
-			timers[i] -= delta
-	# update timer (kinda ugly)
-	perfect_jump_timer = timers[0]
-	jump_buffer_timer = timers[1]
-	slow_down_timer = timers[2]
-	coyote_timer = timers[3]
+	for timer_name in timers:
+		timers[timer_name] = max(0, timers[timer_name] - delta)
+
+func pickup_item(item: ItemData) -> void:
+	player_inventory.add_item(item)
 
 func update_debug_label() -> void:
 	if is_debug_label:
 		debug_label.show()
-		debug_label.text = "jump availabe: %s\ntimer: %s\nmask: %s" % [
-			jump_available, coyote_timer, collision_mask
+		debug_label.text = "speed: %s\njump velocity: %s" % [
+			speed, jump_velocity
 			]
 	else: debug_label.hide()
 
@@ -303,5 +301,5 @@ func process_normal(delta:float) -> void:
 	update_debug_label()
 	handle_quick_respawn()
 
-func process_no_clip(delta: float) -> void:
+func process_no_clip(_delta: float) -> void:
 	handle_no_clip()

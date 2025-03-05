@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://fn3cxvwsjwl7"]
+
+[ext_resource type="Script" path="res://scenes/items/itempickup.gd" id="1_c7a3x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_emddi"]
+size = Vector2(16, 16)
+
+[node name="ItemPickup" type="Area2D"]
+script = ExtResource("1_c7a3x")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_emddi")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -22.0
+offset_top = -17.0
+offset_right = 614.0
+offset_bottom = 126.0
+scale = Vector2(0.0691935, 0.0420282)
+theme_override_font_sizes/font_size = 60
+text = "test"
+horizontal_alignment = 1
+vertical_alignment = 1

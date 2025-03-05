@@ -1,0 +1,10 @@
+[gd_scene load_steps=5 format=3 uid="uid://c2i5niiup03v4"]
+
+[ext_resource type="Script" path="res://scenes/items/itempool.gd" id="1_hmbqa"]
+[ext_resource type="Script" path="res://scenes/items/itemdata.gd" id="2_f42tf"]
+[ext_resource type="Resource" uid="uid://djgykftnthkbi" path="res://scenes/items/speed_up.tres" id="3_b8rql"]
+[ext_resource type="Resource" uid="uid://b7u82ptkfn6w0" path="res://scenes/items/jump_height_up.tres" id="4_lpyr5"]
+
+[node name="Itempool" type="Node2D"]
+script = ExtResource("1_hmbqa")
+items = Array[ExtResource("2_f42tf")]([ExtResource("3_b8rql"), ExtResource("4_lpyr5")])

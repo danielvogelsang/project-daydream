@@ -1,14 +1,16 @@
-[gd_scene load_steps=5 format=4 uid="uid://dqy1utau3l1kp"]
+[gd_scene load_steps=6 format=4 uid="uid://dqy1utau3l1kp"]
 
 [ext_resource type="PackedScene" uid="uid://biq2l3gqa8yie" path="res://scenes/player/player.tscn" id="1_pdo7u"]
 [ext_resource type="Script" path="res://scenes/level/level/camera/Camera2D.gd" id="2_xui6b"]
 [ext_resource type="TileSet" uid="uid://21m3a66frqs6" path="res://tilemaps/test_tilemap.tres" id="3_256ua"]
 [ext_resource type="PackedScene" uid="uid://buelbnflaioii" path="res://scenes/debug/debug_menu.tscn" id="4_ny1k2"]
+[ext_resource type="PackedScene" uid="uid://c2i5niiup03v4" path="res://scenes/items/itempool.tscn" id="5_7rww8"]
 
 [node name="TestLevel" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_pdo7u")]
 position = Vector2(618, 1024)
+is_debug_label = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
@@ -23,3 +25,5 @@ tile_set = ExtResource("3_256ua")
 
 [node name="DebugMenu" parent="." instance=ExtResource("4_ny1k2")]
 follow_viewport_enabled = true
+
+[node name="Itempool" parent="." instance=ExtResource("5_7rww8")]

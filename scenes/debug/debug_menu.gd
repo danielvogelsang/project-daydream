@@ -14,6 +14,8 @@ func _ready() -> void:
 		{"name": "Quick Respawn", "ref": player, "property": "quick_respawn"},
 		{"name": "Debug Label", "ref": player, "property": "is_debug_label"}
 	]
+	
+	update_menu()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("debug"):
@@ -21,8 +23,7 @@ func _process(delta: float) -> void:
 	if player:
 		transform.origin = player.position + Vector2(-65, 30)
 	if visible:
-		input()
-		update_menu()
+		handle_input()
 
 func update_menu() -> void:
 	# clears old labels 
@@ -44,7 +45,7 @@ func toggle_selected() -> void:
 	item["ref"].set(item["property"], !current_value)
 	update_menu()
 
-func input() -> void:
+func handle_input() -> void:
 	if Input.is_action_just_released("ui_up"):
 		selected_index = (selected_index - 1 + menu_items.size()) % menu_items.size()
 		update_menu()
