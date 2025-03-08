@@ -20,7 +20,7 @@ func load_items_from_directory() -> void:
 	var dir = DirAccess.open(items_directory)
 
 	if dir:
-		# Start directory traversal
+		# start directory traversal
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		

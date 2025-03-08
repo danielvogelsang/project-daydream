@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://rofnes7eff65"]
+
+[ext_resource type="Script" uid="uid://dxtess2ltdiiu" path="res://scenes/itemsystem/itemdata.gd" id="1_5isve"]
+
+[resource]
+script = ExtResource("1_5isve")
+item_name = "Double Jump"
+description = "Gives the ability to double jump"
+icon_path = "res://textures/test/sprites/items/double_jump.png"
+type = 0
+id = 1
+speed_increase = 0.0
+jump_height_increase = 0.0
+unique_effect = "DOUBLE_JUMP"
+metadata/_custom_type_script = "uid://dxtess2ltdiiu"

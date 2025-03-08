@@ -5,6 +5,8 @@ var items: Array[ItemData] = []
 var item_effects: Dictionary = {}
 
 @onready var ui_layout: VBoxContainer = $CanvasLayer/MarginContainer/VBoxContainer
+@onready var player: CharacterBody2D = $".."
+@onready var double_jump: Node2D = $"../Abilties/Double Jump"
 
 func add_item(new_item: ItemData) -> void:
 	items.append(new_item)
@@ -15,6 +17,10 @@ func add_item(new_item: ItemData) -> void:
 func apply_item_effect(item: ItemData) -> void:
 	get_parent().speed += item.speed_increase
 	get_parent().jump_velocity += item.jump_height_increase
+	
+	match item.unique_effect:
+		"DOUBLE_JUMP":
+			double_jump.enable()
 
 # remove other unpicked item 
 func destroy_other_items() -> void:

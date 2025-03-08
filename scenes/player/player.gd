@@ -241,12 +241,14 @@ func handle_timers(delta: float) -> void:
 
 func pickup_item(item: ItemData) -> void:
 	player_inventory.add_item(item)
+	
+@onready var double_jump: Node2D = $"Abilties/Double Jump"
 
 func update_debug_label() -> void:
 	if is_debug_label:
 		debug_label.show()
-		debug_label.text = "speed: %s\njump velocity: %s" % [
-			speed, jump_velocity
+		debug_label.text = "candoublejump: %s\njump available: %s" % [
+			double_jump.can_double_jump, jump_available
 			]
 	else: debug_label.hide()
 

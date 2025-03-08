@@ -1,5 +1,5 @@
 extends Node2D
-@onready var player = $"../Player"
+@onready var player = $"../Player" # still needed? throws error and not used 
 
 var tile_1 = {
 	"tile" : "res://scenes/level/stage_1_tilemap/(L)LR_1.tscn",

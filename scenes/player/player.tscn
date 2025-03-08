@@ -1,8 +1,9 @@
-[gd_scene load_steps=44 format=3 uid="uid://biq2l3gqa8yie"]
+[gd_scene load_steps=45 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
-[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
+[ext_resource type="Script" uid="uid://dlcr7aleepe8e" path="res://scenes/player/player.gd" id="1_bgs47"]
 [ext_resource type="PackedScene" uid="uid://buq7iyto65akm" path="res://scenes/player/player_inventory.tscn" id="3_c3ab7"]
+[ext_resource type="Script" uid="uid://cxc63gftpmnin" path="res://scenes/player/double_jump.gd" id="4_lvxji"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hn7j8"]
 atlas = ExtResource("1_0mji1")
@@ -348,3 +349,8 @@ width = 3.0
 default_color = Color(0.0941176, 1, 1, 1)
 
 [node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
+
+[node name="Abilties" type="Node2D" parent="."]
+
+[node name="Double Jump" type="Node2D" parent="Abilties"]
+script = ExtResource("4_lvxji")

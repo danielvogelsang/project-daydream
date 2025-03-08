@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://buelbnflaioii"]
 
-[ext_resource type="Script" path="res://scenes/debug/debug_menu.gd" id="1_ylhvv"]
+[ext_resource type="Script" uid="uid://dljj6glpvajtd" path="res://scenes/debug/debug_menu.gd" id="1_ylhvv"]
 
 [node name="DebugMenu" type="CanvasLayer"]
 visible = false
