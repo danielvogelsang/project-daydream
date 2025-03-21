@@ -29,8 +29,8 @@ func follow_player(delta):
 func move_to_map_center():
 	position.x = move_toward(position.x, center_of_map.x, 100)
 	position.y = move_toward(position.y, center_of_map.y, 100)
-	print(position.x)
-	print(position.y)
+	#print(position.x)
+	#print(position.y)
 	zoom.x = move_toward(zoom.x, 0.15, 0.4)
 	zoom.y = move_toward(zoom.y, 0.15, 0.4)
 

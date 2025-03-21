@@ -7,6 +7,7 @@ var wave_function = []
 var all_prototypes = {}
 var collapsed = false
 var first_iteration = true
+var module_gen_order = []
 
 func initialize(new_size: Vector2, _all_prototypes:Dictionary):
 	size = new_size
@@ -65,6 +66,8 @@ func collapse_at(coords: Vector2):
 			continue
 		else:
 			wave_function[coords.y][coords.x].erase(tile)
+	module_gen_order.append(coords)
+	module_gen_order.append(random_key)
 	#print(random_key)
 	#print("collapse at " + str(wave_function[coords.y][coords.x]))
 	#valid_directions(coords)
@@ -77,6 +80,8 @@ func first_collapse(coords: Vector2):
 			continue
 		else:
 			wave_function[coords.y][coords.x].erase(tile)
+	module_gen_order.append(coords)
+	module_gen_order.append(first_key)
 
 func get_possibilities(_coords):
 	var module = wave_function[_coords.y][_coords.x]
@@ -90,15 +95,15 @@ func get_possibilities(_coords):
 func valid_directions(_coords):
 	var directions = []
 	var module = wave_function[_coords.y][_coords.x]
-	if (_coords.y + 1) <= (size.y-1):
-		if wave_function[_coords.y + 1][_coords.x].size() > module.size():
-			directions.append(Vector2(0,1))
 	if (_coords.x + 1) <= (size.x-1):
 		if wave_function[_coords.y][_coords.x + 1].size() > module.size():
 			directions.append(Vector2(1,0))
 	if (_coords.x - 1) >= 1:
 		if wave_function[_coords.y][_coords.x - 1].size() > module.size():
 			directions.append(Vector2(-1,0))
+	if (_coords.y + 1) <= (size.y-1):
+		if wave_function[_coords.y + 1][_coords.x].size() > module.size():
+			directions.append(Vector2(0,1))
 	#var module_sockets = wave_function[_coords.y][_coords.x]["sockets"]
 	#if module_sockets["left"] == true:
 		#directions[1] = Vector2(-1,0)
@@ -178,6 +183,7 @@ func is_collapsed():
 	
 func iterate():
 	var coords
+	
 	if first_iteration == false:
 		coords = get_min_entropy_coords()
 		await collapse_at(coords)
@@ -189,6 +195,7 @@ func iterate():
 	propagate(coords)
 	if check_collapse_status():
 		print("collapsed")
+		print(module_gen_order)
 		collapsed = true
 #
 func constrain(_coords, tile_name):
@@ -198,6 +205,8 @@ func constrain(_coords, tile_name):
 	
 func propagate(_coords):
 	stack.append(_coords)
+	var old_module = wave_function[_coords.y][_coords.x]
+	#print(old_module.keys())
 	while len(stack) > 0:
 		var cur_coords = stack.pop_back()
 		stack.shuffle()
@@ -211,20 +220,48 @@ func propagate(_coords):
 			var possible_neighbours = get_possible_neighbours(cur_coords, d).duplicate()
 			#print("other_prototypes are", other_possible_prototypes)
 			#print("possible neighbours are", possible_neighbours)
-			if other_possible_prototypes == [0]:
-				continue
-			if len(other_possible_prototypes) == 1:
-				continue
+			#if other_possible_prototypes == [0]:
+				#continue
+			#if len(other_possible_prototypes) == 1:
+				#continue
+			if d == Vector2(-1.0,0.0):
+				var module = wave_function[cur_coords.y][cur_coords.x]
+				#print(module.keys())
+				if module.size() == 1 :
+					if module.has("tile_31"):
+						var other_module = wave_function[other_coords.y][other_coords.x]
+						for key in other_module:
+							if key != "tile_31":
+								#print(key)
+								other_module.erase(key)
+						if not other_coords in stack:
+							stack.append(other_coords)
+						continue
+			if d == Vector2(1,0):
+				var module = wave_function[cur_coords.y][cur_coords.x]
+				#print(module.keys())
+				if module.size() == 1 :
+					if module.has("tile_31"):
+						#print("aua")
+						var other_module = wave_function[other_coords.y][other_coords.x]
+						for key in other_module:
+							if key != "tile_31":
+								other_module.erase(key)
+						if not other_coords in stack:
+							stack.append(other_coords)
+						continue
 			for other_prototype in other_possible_prototypes:
 				if not other_prototype in possible_neighbours:
 					constrain(other_coords, other_prototype)
 					var module = wave_function[other_coords.y][other_coords.x]
 					if module.keys().is_empty():
 						module["tile_31"] = all_prototypes["tile_31"].duplicate()
-						stack.erase(other_coords)
-						continue
-						if not other_coords in stack:
-							stack.append(other_coords)
+						#stack.erase(other_coords)
+						#continue
+					if not other_coords in stack:
+						stack.append(other_coords)
+				
+			
 						
 			#if !wave_function[other_coords.y][other_coords.x].keys() == ["tile_31"]:
 				#if not other_coords in stack:

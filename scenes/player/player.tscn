@@ -348,6 +348,7 @@ position = Vector2(0, 12)
 width = 3.0
 default_color = Color(0.0941176, 1, 1, 1)
 
+
 [node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
 
 [node name="Abilties" type="Node2D" parent="."]
