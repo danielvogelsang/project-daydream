@@ -1,7 +1,7 @@
 [gd_scene load_steps=45 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
-[ext_resource type="Script" uid="uid://dlcr7aleepe8e" path="res://scenes/player/player.gd" id="1_bgs47"]
+[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
 [ext_resource type="PackedScene" uid="uid://buq7iyto65akm" path="res://scenes/player/player_inventory.tscn" id="3_c3ab7"]
 [ext_resource type="Script" uid="uid://cxc63gftpmnin" path="res://scenes/player/double_jump.gd" id="4_lvxji"]
 
@@ -347,7 +347,6 @@ top_level = true
 position = Vector2(0, 12)
 width = 3.0
 default_color = Color(0.0941176, 1, 1, 1)
-
 
 [node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
 
