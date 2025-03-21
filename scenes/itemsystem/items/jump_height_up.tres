@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://b7u82ptkfn6w0"]
+
+[ext_resource type="Script" uid="uid://dxtess2ltdiiu" path="res://scenes/itemsystem/itemdata.gd" id="1_dhavw"]
+
+[resource]
+script = ExtResource("1_dhavw")
+item_name = "Jump Height Up"
+description = "Increases Jump Height"
+icon_path = "res://textures/test/sprites/items/jump_height_up.png"
+type = 0
+id = 2
+speed_increase = 0.0
+jump_height_increase = 100.0
+unique_effect = ""

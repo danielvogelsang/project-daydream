@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://djgykftnthkbi"]
+
+[ext_resource type="Script" uid="uid://dxtess2ltdiiu" path="res://scenes/itemsystem/itemdata.gd" id="1_u5p1c"]
+
+[resource]
+script = ExtResource("1_u5p1c")
+item_name = "Speed Up"
+description = "Increases Movement Speed"
+icon_path = "res://textures/test/sprites/items/speed_up.png"
+type = 0
+id = 1
+speed_increase = 100.0
+jump_height_increase = 0.0
+unique_effect = ""

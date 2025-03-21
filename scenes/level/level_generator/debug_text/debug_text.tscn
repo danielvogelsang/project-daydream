@@ -1,6 +1,7 @@
 [gd_scene load_steps=2 format=3 uid="uid://m4oc108ydjy3"]
 
-[ext_resource type="Script" uid="uid://cvcsshfw1ewxy" path="res://scenes/level/level_generator/debug_text/debug_text.gd" id="1_g6qv6"]
+[ext_resource type="Script" uid="uid://bovp8fslvj817" path="res://scenes/level/level_generator/debug_text/debug_text.gd" id="1_g6qv6"]
+
 
 [node name="DebugText" type="Label"]
 anchors_preset = -1

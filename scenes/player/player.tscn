@@ -1,7 +1,9 @@
 [gd_scene load_steps=45 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
-[ext_resource type="Script" uid="uid://ddpd1hratkr3" path="res://scenes/player/player.gd" id="1_bgs47"]
+[ext_resource type="Script" uid="uid://dlcr7aleepe8e" path="res://scenes/player/player.gd" id="1_bgs47"]
+[ext_resource type="PackedScene" uid="uid://buq7iyto65akm" path="res://scenes/player/player_inventory.tscn" id="3_c3ab7"]
+[ext_resource type="Script" uid="uid://cxc63gftpmnin" path="res://scenes/player/double_jump.gd" id="4_lvxji"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hn7j8"]
 atlas = ExtResource("1_0mji1")
@@ -162,7 +164,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_hn7j8")
 }],
 "loop": false,
-"name": &"Falling",
+"name": &"FALLING",
 "speed": 1.0
 }, {
 "frames": [{
@@ -179,7 +181,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_40sbp")
 }],
 "loop": true,
-"name": &"Idle",
+"name": &"IDLE",
 "speed": 5.0
 }, {
 "frames": [{
@@ -190,7 +192,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_ndfnn")
 }],
 "loop": false,
-"name": &"Jumping",
+"name": &"JUMPING",
 "speed": 5.0
 }, {
 "frames": [{
@@ -243,7 +245,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_l2f6t")
 }],
 "loop": true,
-"name": &"Running",
+"name": &"RUNNING",
 "speed": 10.0
 }, {
 "frames": [{
@@ -314,28 +316,19 @@ animations = [{
 radius = 6.0
 height = 15.86
 
-[sub_resource type="CurveTexture" id="CurveTexture_d03hr"]
-width = 32
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_71ub5"]
-particle_flag_disable_z = true
-gravity = Vector3(0, 0, 0)
-
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_bgs47")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_75p20")
-animation = &"Idle"
+animation = &"JUMPING"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 4.07)
 shape = SubResource("CapsuleShape2D_3ofsw")
 
-[node name="CoyoteTimer" type="Timer" parent="."]
-wait_time = 2.0
-
 [node name="DebugLabel" type="Label" parent="."]
+visible = false
 z_index = 1
 offset_left = -51.0
 offset_top = -49.0
@@ -355,13 +348,10 @@ position = Vector2(0, 12)
 width = 3.0
 default_color = Color(0.0941176, 1, 1, 1)
 
-[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
-visible = false
-position = Vector2(0, 12)
-emitting = false
-amount = 1
-texture = SubResource("CurveTexture_d03hr")
-one_shot = true
-process_material = SubResource("ParticleProcessMaterial_71ub5")
 
-[connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]
+[node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
+
+[node name="Abilties" type="Node2D" parent="."]
+
+[node name="Double Jump" type="Node2D" parent="Abilties"]
+script = ExtResource("4_lvxji")
