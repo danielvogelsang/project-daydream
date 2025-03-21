@@ -437,7 +437,7 @@ func visualize_wave_function():
 			var prototype = wfc.wave_function[y][x]
 			#print(x,y,prototype["tile"])
 			for tile in prototype:
-				print(x,y,tile)
+				#print(x,y,tile)
 				var instance = load(prototype[tile]["tile"]).instantiate()
 				if prototype[tile]["rotation_y"]:
 					instance.scale.x *= -1

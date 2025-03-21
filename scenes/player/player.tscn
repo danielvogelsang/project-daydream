@@ -1,7 +1,7 @@
 [gd_scene load_steps=45 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
-[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
+[ext_resource type="Script" uid="uid://ddpd1hratkr3" path="res://scenes/player/player.gd" id="1_bgs47"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hn7j8"]
 atlas = ExtResource("1_0mji1")
@@ -314,12 +314,12 @@ animations = [{
 radius = 6.0
 height = 15.86
 
+[sub_resource type="CurveTexture" id="CurveTexture_d03hr"]
+width = 32
+
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_71ub5"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 0, 0)
-
-[sub_resource type="CurveTexture" id="CurveTexture_d03hr"]
-width = 32
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_bgs47")
@@ -360,8 +360,8 @@ visible = false
 position = Vector2(0, 12)
 emitting = false
 amount = 1
-process_material = SubResource("ParticleProcessMaterial_71ub5")
 texture = SubResource("CurveTexture_d03hr")
 one_shot = true
+process_material = SubResource("ParticleProcessMaterial_71ub5")
 
 [connection signal="timeout" from="CoyoteTimer" to="." method="coyote_timeout"]
