@@ -70,6 +70,8 @@ var timers: Dictionary = {
 @export var is_debug_label: bool = false
 # trail
 @onready var trail: Line2D = $Trail
+
+
 var max_points: int = 100 
 # no clip activates with debug button
 @export var is_no_clip: bool = false
@@ -288,6 +290,10 @@ func debugging() -> void:
 	handle_quick_respawn()
 	
 
+func _ready():
+	scale = Vector2(1.2,1.2)
+	print("sos")
+	
 func _physics_process(delta: float) -> void:
 	if is_no_clip:
 		process_no_clip(delta)

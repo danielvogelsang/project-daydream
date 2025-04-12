@@ -31,11 +31,13 @@ func move_to_map_center():
 	position.y = move_toward(position.y, center_of_map.y, 100)
 	#print(position.x)
 	#print(position.y)
-	zoom.x = move_toward(zoom.x, 0.15, 0.4)
-	zoom.y = move_toward(zoom.y, 0.15, 0.4)
+	zoom.x = move_toward(zoom.x, 0.3, 0.4)
+	zoom.y = move_toward(zoom.y, 0.3, 0.4)
 
 func _ready():
 	position = starting_position
+	if get_parent().name == "TestLevel":
+		current_mode = camera_mode.PLAYER
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	match current_mode:

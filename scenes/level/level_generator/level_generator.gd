@@ -406,8 +406,9 @@ var tile_31 = {
 	"aboveright": false}
 	}
 	
-var size = Vector2(30,30)
+var size = Vector2(30,15)
 var wfc = WaveFunction.new()
+var worm = WormSolver.new()
 var module
 var meshes
 var all_tiles  = {
@@ -445,13 +446,6 @@ func visualize_wave_function():
 				instance.position.y -= y * 192
 				instance.position.x += x * 192
 				add_child(instance)
-				#var debug_text = load("res://scenes/level/level_generator/debug_text/debug_text.tscn").instantiate()
-				#debug_text.text = JSON.stringify(tile)
-				#if instance.scale.x == -1:
-					#debug_text.scale.x *= -1
-				#debug_text.position.x += x + 96
-				#debug_text.position.y -= y - 96
-				#instance.add_child(debug_text)
 	print("WF fertig!")
 	generation_done.emit()
 				
@@ -461,13 +455,53 @@ func iterate_when_not_collapsed():
 		wfc.iterate()
 	visualize_wave_function()
 
+func visualize_worm():
+	print("visualizing")
+	for y in range(size.y):
+		for x in range(size.x):
+			var state = worm.grid[y][x]
+			#print(x,y,prototype["tile"])
+				#print(x,y,tile)
+			if state == true:
+				var instance = load("res://scenes/level/stage_1_tilemap/LRUlmr_1.tscn").instantiate()
+				instance.position.y -= y * 192
+				instance.position.x += x * 192
+				add_child(instance)
+	print("WF fertig!")
+	generation_done.emit()
+
+func generate_worm():
+	var first_generation = true
+	var coords
+	var generation_completed = false
+	worm.start_generating()
+	while generation_completed == false:
+		if first_generation:
+			first_generation = false
+			coords = Vector2(round(size.x / 2), 0)
+		coords = worm.get_next_coords(coords)
+		if coords == worm.ending_coords:
+			generation_completed = true
+		else:
+			coords = worm.check_grid(coords)
+			#print(coords)
+			worm.change_grid(coords)
+	visualize_worm()
+
+func start_worm_generation():
+	#Worm Solution:
+	var instance_worm = worm.initialize(size)
+	generate_worm()
+	
 func _ready() -> void:
 	generation_done.connect(get_parent()._on_generation_done)
 	create_all_prototypes_dictionary()
-	var instance_wfc = wfc.initialize(size, all_tiles)
-	#add_child(instance_wfc)
-	await get_tree().create_timer(1).timeout
-	iterate_when_not_collapsed()
+	#Wave_function Solution:
+	#var instance_wfc = wfc.initialize(size, all_tiles)
+	##add_child(instance_wfc)
+	#await get_tree().create_timer(1).timeout
+	#iterate_when_not_collapsed()
+	
 	#inst_level()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
