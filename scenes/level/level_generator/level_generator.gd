@@ -411,9 +411,119 @@ var wfc = WaveFunction.new()
 var worm = WormSolver.new()
 var module
 var meshes
+var prototype_dictionary
 var all_tiles  = {
 }
 signal generation_done
+
+func get_prototypes():
+	var dir_name = "res://scenes/level/stage_1_tilemap/"
+	var dir := DirAccess.open(dir_name)
+	var scene_names_array = []
+	if dir == null:
+		print("Ordner konnte nicht geöffnet werden")
+		return
+	
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while file_name != "":
+		scene_names_array.append(file_name)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	return get_prototype_dictionary(dir_name, scene_names_array)
+	
+func get_prototype_dictionary(directory, array):
+	var prototype_dictionary: Dictionary
+	for tile in array: 
+		if tile[0].is_valid_int():
+			prototype_dictionary[tile] = {}
+			prototype_dictionary[tile]["tile"] = directory + tile
+			prototype_dictionary[tile]["sockets"] = {}
+			for char in tile:
+				if char == "1":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["2", "3", "."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[tile]["sockets"]["down_left"]= true
+							"m":
+								prototype_dictionary[tile]["sockets"]["down_middle"]= true
+							"r":
+								prototype_dictionary[tile]["sockets"]["down_right"]= true
+				if char == "2":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["3", "."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[tile]["sockets"]["left"]= true
+							"r":
+								prototype_dictionary[tile]["sockets"]["right"]= true
+				if char == "3":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[tile]["sockets"]["up_left"]= true
+							"m":
+								prototype_dictionary[tile]["sockets"]["up_middle"]= true
+							"r":
+								prototype_dictionary[tile]["sockets"]["up_right"]= true
+							
+			var mirrored_tile = tile.insert(0, "M")
+			prototype_dictionary[mirrored_tile] = {}
+			prototype_dictionary[mirrored_tile]["tile"] = directory + tile
+			prototype_dictionary[mirrored_tile]["mirrored"] = true
+			prototype_dictionary[mirrored_tile]["sockets"] = {}
+			for char in tile:
+				if char == "1":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["2", "3", "."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[mirrored_tile]["sockets"]["down_right"]= true
+							"m":
+								prototype_dictionary[mirrored_tile]["sockets"]["down_middle"]= true
+							"r":
+								prototype_dictionary[mirrored_tile]["sockets"]["down_left"]= true
+				if char == "2":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["3", "."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[mirrored_tile]["sockets"]["right"]= true
+							"r":
+								prototype_dictionary[mirrored_tile]["sockets"]["left"]= true
+				if char == "3":
+					var index = tile.find(char)
+					while true:
+						index += 1
+						if tile[index] in ["."]:
+							break
+						match tile[index]:
+							"l":
+								prototype_dictionary[mirrored_tile]["sockets"]["up_right"]= true
+							"m":
+								prototype_dictionary[mirrored_tile]["sockets"]["up_middle"]= true
+							"r":
+								prototype_dictionary[mirrored_tile]["sockets"]["up_left"]= true
+							
+									
+	return prototype_dictionary
 
 func create_all_prototypes_dictionary():
 	for i in range(1,32):
@@ -495,6 +605,8 @@ func start_worm_generation():
 	
 func _ready() -> void:
 	generation_done.connect(get_parent()._on_generation_done)
+	prototype_dictionary = get_prototypes()
+	print(prototype_dictionary)
 	create_all_prototypes_dictionary()
 	#Wave_function Solution:
 	#var instance_wfc = wfc.initialize(size, all_tiles)
