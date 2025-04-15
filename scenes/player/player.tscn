@@ -272,10 +272,11 @@ script = ExtResource("1_bgs47")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_75p20")
-animation = &"RUNNING"
+animation = &"IDLE"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 0.833333)
+position = Vector2(0, 1.66667)
+scale = Vector2(0.8, 0.8)
 shape = SubResource("CapsuleShape2D_3ofsw")
 
 [node name="DebugLabel" type="Label" parent="."]

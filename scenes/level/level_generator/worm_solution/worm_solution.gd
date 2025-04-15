@@ -45,6 +45,10 @@ func get_next_coords(_coords):
 	var end_modifier = 1
 	if _coords.y == ending_coords.y - 1:
 		end_modifier = 10
+		if current_worm_vector.x > 0:
+			ratio.x = 5
+		else:
+			ratio.x = -5
 	if ratio.x < 0:
 		rand_x = end_modifier * randf_range(ratio.x - 1 , 1)
 	else:
