@@ -198,7 +198,7 @@ func handle_coyote_timer() -> void:
 			timers["coyote"] = coyote_time
 		if is_on_floor():
 			timers["coyote"] = 0
-		if timers["coyote"] < 0:
+		if timers["coyote"] <= 0:
 			jump_available = false
 
 func handle_jump_buffer() -> void:
@@ -249,8 +249,8 @@ func pickup_item(item: ItemData) -> void:
 func update_debug_label() -> void:
 	if is_debug_label:
 		debug_label.show()
-		debug_label.text = "candoublejump: %s\njump available: %s" % [
-			double_jump.can_double_jump, jump_available
+		debug_label.text = "coyote_timer: %s\njump available: %s" % [
+			timers["coyote"], jump_available
 			]
 	else: debug_label.hide()
 
