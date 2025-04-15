@@ -289,10 +289,6 @@ func debugging() -> void:
 	update_debug_label()
 	handle_quick_respawn()
 	
-
-func _ready():
-	scale = Vector2(1.2,1.2)
-	print("sos")
 	
 func _physics_process(delta: float) -> void:
 	if is_no_clip:

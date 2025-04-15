@@ -262,10 +262,12 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3ofsw"]
-radius = 6.0
-height = 15.86
+radius = 5.83333
+height = 11.6667
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(1.2, 1.2)
 script = ExtResource("1_bgs47")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -273,7 +275,7 @@ sprite_frames = SubResource("SpriteFrames_75p20")
 animation = &"RUNNING"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -1)
+position = Vector2(0, 0.833333)
 shape = SubResource("CapsuleShape2D_3ofsw")
 
 [node name="DebugLabel" type="Label" parent="."]
@@ -298,6 +300,7 @@ width = 3.0
 default_color = Color(0.0941176, 1, 1, 1)
 
 [node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
+position = Vector2(0, 0.833333)
 
 [node name="Abilties" type="Node2D" parent="."]
 
