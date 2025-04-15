@@ -289,8 +289,6 @@ func debugging() -> void:
 	update_debug_label()
 	handle_quick_respawn()
 	
-
-	
 func _physics_process(delta: float) -> void:
 	if is_no_clip:
 		process_no_clip(delta)
