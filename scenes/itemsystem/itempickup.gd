@@ -1,5 +1,4 @@
 extends Area2D
-class_name ItemPickup
 
 @export var item: ItemData
 @onready var sprite: Sprite2D = $Sprite

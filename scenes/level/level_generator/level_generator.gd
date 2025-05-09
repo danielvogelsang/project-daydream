@@ -170,7 +170,14 @@ func visualize_worm(worm_function):
 			if worm_tile == null:
 				continue
 			for tile in worm_tile:
-				var instance = load(worm_tile[tile]["tile"]).instantiate()
+				var instance
+				if worm_tile[tile].has("item_tile"):
+					instance = load("uid://78pech8i1dyn").instantiate()
+					var item_pos = Vector2((x+0.5) * level_root.tile_size, (y-0.5) *level_root.tile_size * -1)
+					print(item_pos)
+					Itempool.generate_item_drop(item_pos)
+				else:
+					instance = load(worm_tile[tile]["tile"]).instantiate()
 				if worm_tile[tile].has("mirrored"):
 					instance.scale.x *= -1
 					instance.position.x += level_root.tile_size
@@ -181,7 +188,8 @@ func visualize_worm(worm_function):
 	generation_done.emit()
 
 func fill_worm():
-	var instance_worm_filling = wfm.initialize(size, worm, prototype_dictionary)
+	var level = 1
+	var instance_worm_filling = wfm.initialize(size, worm, prototype_dictionary, level)
 	var first_fill = true
 	var coords
 	var filling_completed = false
@@ -197,6 +205,7 @@ func fill_worm():
 			coords = wfm.get_next_coords(coords)
 			print(coords)
 			wfm.collapse_worm(coords)
+			wfm.item_check(coords)
 			wfm.propagate_worm(coords)
 	visualize_worm(wfm.wf_function)
 

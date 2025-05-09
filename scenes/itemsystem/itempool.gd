@@ -1,6 +1,5 @@
 # should be part of GameManager in the future (I think)
 extends Node
-class_name ItemPool
 
 @export var items_directory: String = "res://scenes/itemsystem/items/"
 @export var items: Array[ItemData] = []
@@ -9,8 +8,6 @@ var used_items: Array[ItemData] = []
 
 func _ready() -> void:
 	load_items_from_directory()
-	generate_item_drop(Vector2(950, 1040))
-	generate_item_drop(Vector2(850, 1040))
 
 func load_items_from_directory() -> void:
 	# reset items

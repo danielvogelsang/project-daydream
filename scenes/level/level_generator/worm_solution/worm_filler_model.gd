@@ -10,8 +10,13 @@ var collapsed = false
 var first_iteration = true
 var module_gen_order = []
 var current_worm
+var current_level
 
-func initialize(new_size, worm, _all_prototypes:Dictionary):
+var item_spawn_dict = {
+	"level_1": [[2, true],[5, true], [10, true]]
+}
+
+func initialize(new_size, worm, _all_prototypes:Dictionary, level):
 	size = new_size
 	current_worm = worm
 	all_prototypes = _all_prototypes.duplicate()
@@ -24,8 +29,10 @@ func initialize(new_size, worm, _all_prototypes:Dictionary):
 			else:
 				x.append(null)
 		wf_function.append(x)
+	current_level = level
 	#print(wf_function)
-	
+
+
 func get_next_coords(_coords):
 	var current_coords = _coords
 	print("get_next_coords to ", current_coords)
@@ -73,6 +80,7 @@ func check_grid(_coords, d):
 	if _coords.y + d.y == size.y:
 		return false
 	return true
+	
 func propagate_at(_coords, d):
 	var module = wf_function[_coords.y][_coords.x]
 	var list_of_neighbours = []
@@ -432,6 +440,15 @@ func propagate_at(_coords, d):
 			#if !wave_function[other_coords.y][other_coords.x].keys() == ["tile_31"]:
 				#if not other_coords in stack:
 						#stack.append(other_coords)
+
+func item_check(_coords):
+	var item_spawns = item_spawn_dict["level_"+ str(current_level)]
+	for i in item_spawns:
+		if _coords.y == i[0] and i[1]:
+			i[1] = false
+			var module = wf_function[_coords.y][_coords.x]
+			for tile in module:
+				module[tile]["item_tile"] = true
 
 func collapsed_check():
 	for _y in range(size.y):
