@@ -53,8 +53,8 @@ func get_next_coords(_coords):
 		rand_x = end_modifier * randf_range(ratio.x - 1 , 1)
 	else:
 		rand_x = end_modifier * randf_range(-1, ratio.x + 1 )
-	print(_coords)
-	print(rand_x, " ",  ratio.y)
+	#print(_coords)
+	#print(rand_x, " ",  ratio.y)
 	if _coords.x == ending_coords.x and _coords.y == ending_coords.y - 1:
 		return Vector2(_coords.x, _coords.y + 1)
 	if 0.5 > abs(rand_x) and ratio.y > 0.08:

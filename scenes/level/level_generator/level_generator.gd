@@ -1,414 +1,11 @@
 extends Node2D
 @onready var player = $"../Player" # still needed? throws error and not used 
+@onready var level_root = $".."
 
-var tile_1 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LR_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_2 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LR_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_3 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LUlm_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_4 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LUlm_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_5 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LUmr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_6 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)LUmr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": false,
-	"right": true,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_7 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)RUmr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_8 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)RUmr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": true,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_9 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)R_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_10 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)R_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": true,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_11 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)Umr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : true,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": false,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_12 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/(L)Umr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": true,
-	"left": false,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_13 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-L-RUmr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_14 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-L-RUmr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_15 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-L-Ulm_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_16 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-L-Ulm_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_17 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-LR-LR_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_18 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/-LR-LR_2.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_19 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/LRUlmr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_20 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/LR_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_21 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/LUlm_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": false}
-	}
-var tile_22 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/LUlm_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_23 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/L_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_24 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/L_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_25 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/RUlr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": true,
-	"abovemiddle": false,
-	"aboveright": true}
-	}
-var tile_26 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/RUlr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": false,
-	"aboveright": true}
-	}
-var tile_27 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/R_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": true,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_28 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/R_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": true,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-var tile_29 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/Ulmr_1.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_30 = {
-	"tile" : "res://scenes/level/stage_1_tilemap/Ulmr_1.tscn",
-	"rotation_y" : true,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : true,
-	"belowright": false,
-	"left": false,
-	"right": false,
-	"aboveleft": true,
-	"abovemiddle": true,
-	"aboveright": true}
-	}
-var tile_31 = {
-	
-	"tile" : "res://scenes/level/stage_1_tilemap/Air.tscn",
-	"rotation_y" : false,
-	"sockets" : {
-	"belowleft" : false,
-	"belowmiddle" : false,
-	"belowright": false,
-	"left": false,
-	"right": false,
-	"aboveleft": false,
-	"abovemiddle": false,
-	"aboveright": false}
-	}
-	
 var size = Vector2(30,15)
 var wfc = WaveFunction.new()
 var worm = WormSolver.new()
+var wfm = WormFiller.new()
 var module
 var meshes
 var prototype_dictionary
@@ -417,7 +14,7 @@ var all_tiles  = {
 signal generation_done
 
 func get_prototypes():
-	var dir_name = "res://scenes/level/stage_1_tilemap/"
+	var dir_name = "res://scenes/level/stage_1_bigger_tilemap/"
 	var dir := DirAccess.open(dir_name)
 	var scene_names_array = []
 	if dir == null:
@@ -565,20 +162,43 @@ func iterate_when_not_collapsed():
 		wfc.iterate()
 	visualize_wave_function()
 
-func visualize_worm():
+func visualize_worm(worm_function):
 	print("visualizing")
 	for y in range(size.y):
 		for x in range(size.x):
-			var state = worm.grid[y][x]
-			#print(x,y,prototype["tile"])
-				#print(x,y,tile)
-			if state == true:
-				var instance = load("res://scenes/level/stage_1_tilemap/LRUlmr_1.tscn").instantiate()
-				instance.position.y -= y * 192
-				instance.position.x += x * 192
+			var worm_tile = worm_function[y][x]
+			if worm_tile == null:
+				continue
+			for tile in worm_tile:
+				var instance = load(worm_tile[tile]["tile"]).instantiate()
+				if worm_tile[tile].has("mirrored"):
+					instance.scale.x *= -1
+					instance.position.x += level_root.tile_size
+				instance.position.y -= y * level_root.tile_size
+				instance.position.x += x * level_root.tile_size
 				add_child(instance)
 	print("WF fertig!")
 	generation_done.emit()
+
+func fill_worm():
+	var instance_worm_filling = wfm.initialize(size, worm, prototype_dictionary)
+	var first_fill = true
+	var coords
+	var filling_completed = false
+	while filling_completed == false:
+		if first_fill:
+			first_fill = false
+			coords = Vector2(round(size.x/2), 0)
+			wfm.first_worm_collapse(coords)
+			wfm.propagate_worm(coords)
+		if wfm.collapsed_check():
+			filling_completed = true
+		else:
+			coords = wfm.get_next_coords(coords)
+			print(coords)
+			wfm.collapse_worm(coords)
+			wfm.propagate_worm(coords)
+	visualize_worm(wfm.wf_function)
 
 func generate_worm():
 	var first_generation = true
@@ -596,7 +216,7 @@ func generate_worm():
 			coords = worm.check_grid(coords)
 			#print(coords)
 			worm.change_grid(coords)
-	visualize_worm()
+	fill_worm()
 
 func start_worm_generation():
 	#Worm Solution:
@@ -606,7 +226,7 @@ func start_worm_generation():
 func _ready() -> void:
 	generation_done.connect(get_parent()._on_generation_done)
 	prototype_dictionary = get_prototypes()
-	print(prototype_dictionary)
+	#print(prototype_dictionary)
 	create_all_prototypes_dictionary()
 	#Wave_function Solution:
 	#var instance_wfc = wfc.initialize(size, all_tiles)
@@ -615,7 +235,3 @@ func _ready() -> void:
 	#iterate_when_not_collapsed()
 	
 	#inst_level()
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

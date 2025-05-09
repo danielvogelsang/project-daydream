@@ -13,6 +13,7 @@ var starting_x
 var starting_y
 var level_size = Vector2()
 
+var tile_size = 256
 #func generate_level():
 	#for i in 100:
 		#if i == 50:
@@ -45,9 +46,9 @@ func inst_player():
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#generate_level()
-	level_size.x = level_generator.size.x * 192
-	level_size.y = level_generator.size.y * 192
-	starting_x = (level_generator.size.x * 0.5 * 192) + 96
+	level_size.x = level_generator.size.x * tile_size
+	level_size.y = level_generator.size.y * tile_size
+	starting_x = (level_generator.size.x * 0.5 * tile_size) + 96
 	starting_y = 0
 	camera.center_of_map.x = level_size.x * 0.5
 	camera.center_of_map.y = level_size.y * -0.5
