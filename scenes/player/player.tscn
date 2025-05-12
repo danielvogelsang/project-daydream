@@ -1,10 +1,11 @@
-[gd_scene load_steps=39 format=3 uid="uid://biq2l3gqa8yie"]
+[gd_scene load_steps=41 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
 [ext_resource type="Texture2D" uid="uid://f54p14nj0hlr" path="res://textures/character/Elias_Char_Test.png" id="2_p47bc"]
 [ext_resource type="PackedScene" uid="uid://buq7iyto65akm" path="res://scenes/player/player_inventory.tscn" id="3_c3ab7"]
 [ext_resource type="Script" uid="uid://cxc63gftpmnin" path="res://scenes/player/double_jump.gd" id="4_lvxji"]
+[ext_resource type="Script" uid="uid://chrcy2kqqv27y" path="res://scenes/systems/hurtbox/hurtbox.gd" id="6_75vfm"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_75vfm"]
 atlas = ExtResource("2_p47bc")
@@ -265,10 +266,15 @@ animations = [{
 radius = 5.83333
 height = 11.6667
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_p47bc"]
+radius = 5.0
+height = 15.0
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
 scale = Vector2(1.2, 1.2)
 script = ExtResource("1_bgs47")
+quick_respawn = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_75p20")
@@ -307,3 +313,15 @@ position = Vector2(0, 0.833333)
 
 [node name="Double Jump" type="Node2D" parent="Abilties"]
 script = ExtResource("4_lvxji")
+
+[node name="hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("6_75vfm")
+
+[node name="hurtboxcollision" type="CollisionShape2D" parent="hurtbox"]
+shape = SubResource("CapsuleShape2D_p47bc")
+
+[connection signal="area_entered" from="hurtbox" to="hurtbox" method="_on_area_entered"]
+[connection signal="body_entered" from="hurtbox" to="." method="_on_hurtbox_body_entered"]
+[connection signal="body_entered" from="hurtbox" to="hurtbox" method="_on_body_entered"]

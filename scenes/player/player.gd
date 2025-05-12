@@ -284,6 +284,9 @@ func handle_quick_respawn() -> void:
 			if position.y > last_y_position_on_floor + respawn_window:
 				position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
 
+func take_damage():
+	position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+	
 func debugging() -> void:
 	draw_trail()
 	update_debug_label()
