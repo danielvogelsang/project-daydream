@@ -274,7 +274,6 @@ height = 15.0
 z_index = 1
 scale = Vector2(1.2, 1.2)
 script = ExtResource("1_bgs47")
-quick_respawn = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_75p20")
@@ -322,6 +321,12 @@ script = ExtResource("6_75vfm")
 [node name="hurtboxcollision" type="CollisionShape2D" parent="hurtbox"]
 shape = SubResource("CapsuleShape2D_p47bc")
 
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
+position = Vector2(-3.57628e-07, -0.416667)
+scale = Vector2(0.833333, 0.875)
+
 [connection signal="area_entered" from="hurtbox" to="hurtbox" method="_on_area_entered"]
 [connection signal="body_entered" from="hurtbox" to="." method="_on_hurtbox_body_entered"]
 [connection signal="body_entered" from="hurtbox" to="hurtbox" method="_on_body_entered"]
+[connection signal="screen_entered" from="VisibleOnScreenEnabler2D" to="." method="_on_visible_on_screen_enabler_2d_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenEnabler2D" to="." method="_on_visible_on_screen_enabler_2d_screen_exited"]

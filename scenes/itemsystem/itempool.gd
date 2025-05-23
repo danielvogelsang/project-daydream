@@ -45,7 +45,7 @@ func get_random_item() -> ItemData:
 		return null
 
 	var selected_item = available_items[randi() % available_items.size()]
-	used_items.append(selected_item)
+	#used_items.append(selected_item)
 	return selected_item
 
 func generate_item_drop(position: Vector2) -> void:
@@ -55,4 +55,8 @@ func generate_item_drop(position: Vector2) -> void:
 		var item_pickup = preload("res://scenes/itemsystem/itempickup.tscn").instantiate()
 		item_pickup.item = dropped_item
 		item_pickup.global_position = position
-		get_tree().current_scene.add_child.call_deferred(item_pickup)
+		add_child.call_deferred(item_pickup)
+
+func reset_spawned_items():
+	for i in get_children():
+		i.queue_free()

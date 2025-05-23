@@ -4,14 +4,14 @@ extends Node2D
 
 var size = Vector2(30,15)
 var wfc = WaveFunction.new()
-var worm = WormSolver.new()
-var wfm = WormFiller.new()
 var module
 var meshes
 var prototype_dictionary
 var all_tiles  = {
 }
 signal generation_done
+
+var item_coords = []
 
 func get_prototypes():
 	var dir_name = "res://scenes/level/stage_1_bigger_tilemap/"
@@ -158,7 +158,7 @@ func visualize_wave_function():
 				
 func iterate_when_not_collapsed():
 	while not wfc.is_collapsed():
-		print("iterate")
+		#print("iterate")
 		wfc.iterate()
 	visualize_wave_function()
 
@@ -171,11 +171,12 @@ func visualize_worm(worm_function):
 				continue
 			for tile in worm_tile:
 				var instance
-				if worm_tile[tile].has("item_tile"):
-					instance = load("uid://78pech8i1dyn").instantiate()
-					var item_pos = Vector2((x+0.5) * level_root.tile_size, (y-0.5) *level_root.tile_size * -1)
-					print(item_pos)
-					Itempool.generate_item_drop(item_pos)
+				if check_item_coords(x,y):
+						print(x," ", y)
+						instance = load("uid://78pech8i1dyn").instantiate()
+						var item_pos = Vector2((x+0.5) * level_root.tile_size, (y-0.5) *level_root.tile_size * -1)
+						print(item_pos)
+						Itempool.generate_item_drop(item_pos)
 				else:
 					instance = load(worm_tile[tile]["tile"]).instantiate()
 				if worm_tile[tile].has("mirrored"):
@@ -187,9 +188,10 @@ func visualize_worm(worm_function):
 	print("WF fertig!")
 	generation_done.emit()
 
-func fill_worm():
+func fill_worm(instance_worm):
 	var level = 1
-	var instance_worm_filling = wfm.initialize(size, worm, prototype_dictionary, level)
+	var wfm = WormFiller.new()
+	var iwf = wfm.initialize(size, instance_worm, prototype_dictionary, level)
 	var first_fill = true
 	var coords
 	var filling_completed = false
@@ -197,41 +199,52 @@ func fill_worm():
 		if first_fill:
 			first_fill = false
 			coords = Vector2(round(size.x/2), 0)
-			wfm.first_worm_collapse(coords)
-			wfm.propagate_worm(coords)
-		if wfm.collapsed_check():
+			iwf.first_worm_collapse(coords)
+			iwf.propagate_worm(coords)
+		if iwf.collapsed_check():
 			filling_completed = true
 		else:
-			coords = wfm.get_next_coords(coords)
-			print(coords)
-			wfm.collapse_worm(coords)
-			wfm.item_check(coords)
-			wfm.propagate_worm(coords)
-	visualize_worm(wfm.wf_function)
+			coords = iwf.get_next_coords(coords)
+			if coords == Vector2(-1,-1):
+				continue
+			#print(coords)
+			iwf.collapse_worm(coords)
+			var item_placing = iwf.item_check(coords)
+			if item_placing:
+				item_coords.append(coords)
+			iwf.propagate_worm(coords)
+	visualize_worm(iwf.wf_function)
 
-func generate_worm():
+func generate_worm(instance_worm):
 	var first_generation = true
 	var coords
 	var generation_completed = false
-	worm.start_generating()
+	instance_worm.start_generating()
 	while generation_completed == false:
 		if first_generation:
 			first_generation = false
 			coords = Vector2(round(size.x / 2), 0)
-		coords = worm.get_next_coords(coords)
-		if coords == worm.ending_coords:
+		coords = instance_worm.get_next_coords(coords)
+		if coords == instance_worm.ending_coords:
 			generation_completed = true
 		else:
-			coords = worm.check_grid(coords)
+			coords = instance_worm.check_grid(coords)
 			#print(coords)
-			worm.change_grid(coords)
-	fill_worm()
+			instance_worm.change_grid(coords)
+	fill_worm(instance_worm)
 
 func start_worm_generation():
 	#Worm Solution:
+	item_coords.clear()
+	var worm = WormSolver.new()
 	var instance_worm = worm.initialize(size)
-	generate_worm()
+	generate_worm(instance_worm)
 	
+func check_item_coords(_x,_y):
+	for _coords in item_coords:
+		if Vector2(_x,_y) == _coords:
+			return true
+	return false
 func _ready() -> void:
 	generation_done.connect(get_parent()._on_generation_done)
 	prototype_dictionary = get_prototypes()

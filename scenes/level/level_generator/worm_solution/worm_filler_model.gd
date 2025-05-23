@@ -24,25 +24,25 @@ func initialize(new_size, worm, _all_prototypes:Dictionary, level):
 		var x = []
 		for _x in range(size.x):
 			if worm.grid[_y][_x]:
-				print(_y,_x)
+				#print(_y,_x)
 				x.append(all_prototypes.duplicate())
 			else:
 				x.append(null)
 		wf_function.append(x)
 	current_level = level
 	#print(wf_function)
-
+	return self
 
 func get_next_coords(_coords):
 	var current_coords = _coords
-	print("get_next_coords to ", current_coords)
+	#print("get_next_coords to ", current_coords)
 	for _y in range(current_coords.y, size.y):
 		for _x in range(0, size.x):
 			if wf_function[_y][_x] != null:
 				if abs(_x - current_coords.x) == 1 or (_y - current_coords.y) == 1:
 					if wf_function[_y][_x].size() != 1:
 						return Vector2(_x,_y)
-					
+	return Vector2(-1,-1)
 	
 func first_worm_collapse(_coords):
 	var current_coords = _coords
@@ -66,13 +66,16 @@ func propagate_worm(_coords):
 	var list_of_neighbours = []
 	var d_vector
 	d_vector = Vector2(1,0)
-	propagate_at(_coords, d_vector)
+	if _coords.x + d_vector.x != size.x:
+		propagate_at(_coords, d_vector)
 	
 	d_vector = Vector2(-1,0)
-	propagate_at(_coords, d_vector)
+	if _coords.x - d_vector.x != 0:
+		propagate_at(_coords, d_vector)
 	
 	d_vector = Vector2(0,1)
-	propagate_at(_coords, d_vector)
+	if _coords.y + d_vector.y != size.y:
+		propagate_at(_coords, d_vector)
 	
 func check_grid(_coords, d):
 	if _coords.x + d.x == size.x:
@@ -192,7 +195,7 @@ func propagate_at(_coords, d):
 							new_module.erase(new_tile)
 								
 								
-	print(d, "x: ", _coords.x," y: ", _coords.y, "Die Liste der potentiellen Nachbarn ist: ", list_of_neighbours)
+	#print(d, "x: ", _coords.x," y: ", _coords.y, "Die Liste der potentiellen Nachbarn ist: ", list_of_neighbours)
 	return list_of_neighbours
 
 #func check_collapse_status():
@@ -446,10 +449,8 @@ func item_check(_coords):
 	for i in item_spawns:
 		if _coords.y == i[0] and i[1]:
 			i[1] = false
-			var module = wf_function[_coords.y][_coords.x]
-			for tile in module:
-				module[tile]["item_tile"] = true
-
+			return true
+	return false
 func collapsed_check():
 	for _y in range(size.y):
 		for _x in range(size.x):

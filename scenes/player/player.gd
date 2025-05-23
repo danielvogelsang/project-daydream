@@ -5,6 +5,7 @@ const GRAVITY: float = 600.0
 const FALLING_GRAVITY: float = 900.0
 const MAX_FALL_SPEED: float = 350.0
 const AIR_RESISTANCE: float = 50
+const base_health = 3
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player_inventory: PlayerInventory = $PlayerInventory
@@ -57,6 +58,13 @@ var player_stretch: Vector2 = Vector2(0.6, 1.4)
 var player_squash: Vector2 = Vector2(1.2, 0.8)
 var scale_back_speed: float = 3.0
 
+# health
+var health
+signal death 
+
+#camera
+var on_camera = false
+
 var timers: Dictionary = {
 	"perfect_jump": 0.0,
 	"jump_buffer": 0.0,
@@ -70,9 +78,8 @@ var timers: Dictionary = {
 @export var is_debug_label: bool = false
 # trail
 @onready var trail: Line2D = $Trail
-
-
 var max_points: int = 100 
+
 # no clip activates with debug button
 @export var is_no_clip: bool = false
 var no_clip_speed: float = 200.0
@@ -277,15 +284,27 @@ func handle_no_clip() -> void:
 			velocity.y += no_clip_speed
 		move_and_slide()
 	
-
+func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
+	var camera = $"../Camera2D"
+	if camera.current_mode == camera.camera_mode.PLAYER:
+		take_damage()
+	
+	
 func handle_quick_respawn() -> void:
 	if quick_respawn:
 		if last_y_position_on_floor:
 			if position.y > last_y_position_on_floor + respawn_window:
-				position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+				print("aua")
+				take_damage()
+
 
 func take_damage():
-	position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+	health -= 1
+	print(health)
+	if health != 0:
+		position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+	else:
+		death.emit()
 	
 func debugging() -> void:
 	draw_trail()

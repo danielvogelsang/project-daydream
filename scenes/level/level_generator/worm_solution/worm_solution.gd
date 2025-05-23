@@ -20,7 +20,7 @@ func initialize(new_size: Vector2):
 		for _x in range(size.x):
 			x.append(false)
 		grid.append(x)
-
+	return self
 func start_generating():
 	var start_y = 0
 	var start_x = round(size.x / 2)
