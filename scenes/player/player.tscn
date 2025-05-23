@@ -1,10 +1,11 @@
-[gd_scene load_steps=41 format=3 uid="uid://biq2l3gqa8yie"]
+[gd_scene load_steps=42 format=3 uid="uid://biq2l3gqa8yie"]
 
 [ext_resource type="Texture2D" uid="uid://c3ufil4jur8fd" path="res://textures/test/sprites/knight.png" id="1_0mji1"]
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_bgs47"]
 [ext_resource type="Texture2D" uid="uid://f54p14nj0hlr" path="res://textures/character/Elias_Char_Test.png" id="2_p47bc"]
 [ext_resource type="PackedScene" uid="uid://buq7iyto65akm" path="res://scenes/player/player_inventory.tscn" id="3_c3ab7"]
 [ext_resource type="Script" uid="uid://cxc63gftpmnin" path="res://scenes/player/double_jump.gd" id="4_lvxji"]
+[ext_resource type="Script" uid="uid://bxst0ugujq84x" path="res://scenes/player/dash.gd" id="6_0owmy"]
 [ext_resource type="Script" uid="uid://chrcy2kqqv27y" path="res://scenes/systems/hurtbox/hurtbox.gd" id="6_75vfm"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_75vfm"]
@@ -308,10 +309,13 @@ default_color = Color(0.0941176, 1, 1, 1)
 [node name="PlayerInventory" parent="." instance=ExtResource("3_c3ab7")]
 position = Vector2(0, 0.833333)
 
-[node name="Abilties" type="Node2D" parent="."]
+[node name="Abilities" type="Node2D" parent="."]
 
-[node name="Double Jump" type="Node2D" parent="Abilties"]
+[node name="Double Jump" type="Node2D" parent="Abilities"]
 script = ExtResource("4_lvxji")
+
+[node name="Dash" type="Node2D" parent="Abilities"]
+script = ExtResource("6_0owmy")
 
 [node name="hurtbox" type="Area2D" parent="."]
 collision_layer = 2

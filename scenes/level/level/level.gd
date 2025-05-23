@@ -61,6 +61,7 @@ func get_ready():
 func reset_level():
 	get_ready()
 	Itempool.reset_spawned_items()
+	player.player_inventory.reset_items()
 	for i in level_generator.get_children():
 		print(i)
 		i.queue_free()
@@ -68,7 +69,7 @@ func reset_level():
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#generate_level()
-	player.death.connect(_on_player_death)
+	player.death_signal.connect(_on_player_death)
 	get_ready()
 	level_generator.start_worm_generation()
 # Called every frame. 'delta' is the elapsed time since the previous frame.

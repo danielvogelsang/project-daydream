@@ -7,6 +7,8 @@ var can_double_jump: bool = true
 
 func enable() -> void:
 	enabled = true
+func disable():
+	enabled = false
 
 func _physics_process(_delta: float) -> void:
 	if enabled == false:

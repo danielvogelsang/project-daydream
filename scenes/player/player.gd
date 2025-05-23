@@ -60,10 +60,13 @@ var scale_back_speed: float = 3.0
 
 # health
 var health
-signal death 
+signal death_signal
 
 #camera
 var on_camera = false
+
+#floating for dashing:
+var floating = false
 
 var timers: Dictionary = {
 	"perfect_jump": 0.0,
@@ -142,6 +145,9 @@ func move_right() -> void:
 	anim_player.flip_h = false
 
 func handle_horizontal_input() -> void:
+	if floating:
+		return
+	
 	direction_change_slowdown()
 	
 	var input_direction: float = Input.get_axis("left", "right")
@@ -183,12 +189,17 @@ func direction_change_slowdown() -> void:
 	previous_direction = current_direction
 
 func apply_air_resistance() -> void:
+	if floating:
+		return
+	
 	if not is_on_floor(): 
 		current_speed = speed - current_air_resistance
 	else: 
 		current_speed = speed
 
 func handle_gravity(delta: float) -> void:
+	if floating:
+		return
 	# falling gravity applied when falling
 	if current_state == PlayerState.FALLING:
 		velocity.y += FALLING_GRAVITY * delta
@@ -251,7 +262,6 @@ func handle_timers(delta: float) -> void:
 func pickup_item(item: ItemData) -> void:
 	player_inventory.add_item(item)
 	
-@onready var double_jump: Node2D = $"Abilties/Double Jump"
 
 func update_debug_label() -> void:
 	if is_debug_label:
@@ -304,7 +314,11 @@ func take_damage():
 	if health != 0:
 		position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
 	else:
-		death.emit()
+		death()
+		death_signal.emit()
+	
+func death():
+	player_inventory.reset_items()
 	
 func debugging() -> void:
 	draw_trail()

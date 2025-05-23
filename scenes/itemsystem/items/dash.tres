@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://cqxjx5ulyigqn"]
+
+[ext_resource type="Script" uid="uid://dxtess2ltdiiu" path="res://scenes/itemsystem/itemdata.gd" id="1_yjb1a"]
+
+[resource]
+script = ExtResource("1_yjb1a")
+item_name = "Dash"
+description = "Gives the ability to dash"
+icon_path = "res://textures/test/sprites/items/double_jump.png"
+type = 1
+id = 4
+speed_increase = 0.0
+jump_height_increase = 0.0
+unique_effect = "DASH"
+metadata/_custom_type_script = "uid://dxtess2ltdiiu"
