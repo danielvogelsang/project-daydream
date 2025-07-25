@@ -6,7 +6,7 @@
 script = ExtResource("1_dhavw")
 item_name = "Jump Height Up"
 description = "Increases Jump Height"
-icon_path = "res://textures/test/sprites/items/jump_height_up.png"
+icon_path = "res://textures/game_icon/item_icons/jump_high1.png"
 type = 0
 id = 2
 speed_increase = 0.0

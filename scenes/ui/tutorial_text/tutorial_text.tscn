@@ -1,0 +1,83 @@
+[gd_scene load_steps=6 format=3 uid="uid://xitpts0kms5j"]
+
+[ext_resource type="Script" uid="uid://b61ku7mr8r3wf" path="res://scenes/ui/tutorial_text/beginning_text_box.gd" id="1_g1rbw"]
+[ext_resource type="Texture2D" uid="uid://o66lslnl1aop" path="res://textures/ui/icons/controller_input_icons/Button/X_color_dark.png" id="2_14ymh"]
+[ext_resource type="Texture2D" uid="uid://pdg7fpxkokvb" path="res://textures/ui/icons/keyboard_icons/O_gr.png" id="3_pitkm"]
+[ext_resource type="Texture2D" uid="uid://0bess2x5xxn1" path="res://textures/ui/icons/controller_input_icons/Button/A_color_dark.png" id="4_a83ld"]
+[ext_resource type="Texture2D" uid="uid://bs26ekj5u172s" path="res://textures/ui/icons/keyboard_icons/P_gr.png" id="5_u60hk"]
+
+[node name="tutorial_text" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_g1rbw")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 357.0
+offset_top = 317.0
+offset_right = 1498.0
+offset_bottom = 746.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "Dies ist der Prototyp von dem 
+Roguelike-Combatfree Platformer \"DayDream\"!
+
+Erreiche die Spitze! 
+
+Bei neuen Fähigkeiten nutze       / "
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1102.0
+offset_top = 895.0
+offset_right = 1701.0
+offset_bottom = 964.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "             Tagträumen:        /"
+
+[node name="x_controller" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1230.0
+offset_top = 680.0
+offset_right = 1292.0
+offset_bottom = 742.0
+texture = ExtResource("2_14ymh")
+expand_mode = 1
+
+[node name="o_keyboard" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1332.0
+offset_top = 683.0
+offset_right = 1392.0
+offset_bottom = 744.0
+texture = ExtResource("3_pitkm")
+expand_mode = 1
+
+[node name="a_controller" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1597.0
+offset_top = 896.0
+offset_right = 1670.0
+offset_bottom = 969.0
+texture = ExtResource("4_a83ld")
+expand_mode = 1
+
+[node name="p_keyboard" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1725.0
+offset_top = 898.0
+offset_right = 1794.0
+offset_bottom = 968.0
+texture = ExtResource("5_u60hk")
+expand_mode = 1

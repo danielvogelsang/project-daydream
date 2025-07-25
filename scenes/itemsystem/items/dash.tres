@@ -6,7 +6,7 @@
 script = ExtResource("1_yjb1a")
 item_name = "Dash"
 description = "Gives the ability to dash"
-icon_path = "res://textures/test/sprites/items/double_jump.png"
+icon_path = "res://textures/game_icon/item_icons/dash1.png"
 type = 1
 id = 4
 speed_increase = 0.0

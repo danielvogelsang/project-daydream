@@ -1,19 +1,76 @@
-[gd_scene load_steps=5 format=3 uid="uid://decnrykxi7yyn"]
+[gd_scene load_steps=11 format=3 uid="uid://decnrykxi7yyn"]
 
 [ext_resource type="Script" uid="uid://v7kj56qqe4k0" path="res://scenes/level/level/level.gd" id="1_8kisy"]
 [ext_resource type="Script" uid="uid://bbmlr4jqtqdjj" path="res://scenes/level/level/camera/Camera2D.gd" id="3_mujxj"]
 [ext_resource type="PackedScene" uid="uid://biq2l3gqa8yie" path="res://scenes/player/player.tscn" id="4_1en8t"]
 [ext_resource type="PackedScene" uid="uid://c4ocgxp343yfd" path="res://scenes/level/level_generator/level_generator.tscn" id="4_jexix"]
+[ext_resource type="Texture2D" uid="uid://bweb1kq2q7c4m" path="res://textures/backgrounds/poster_illustration_sketch-Sheet.png" id="5_8a2bs"]
+[ext_resource type="PackedScene" uid="uid://c6e4gb6h1utqq" path="res://scenes/ui/death_screen/death_screen.tscn" id="7_b853s"]
+[ext_resource type="PackedScene" uid="uid://dk05l8mf8bh28" path="res://scenes/ui/title_screen/titlemenu.tscn" id="7_n68hn"]
+[ext_resource type="PackedScene" uid="uid://xitpts0kms5j" path="res://scenes/ui/tutorial_text/tutorial_text.tscn" id="8_1l6au"]
+[ext_resource type="PackedScene" uid="uid://dhaaycewaijy4" path="res://scenes/player/health/health_ui.tscn" id="8_n68hn"]
+[ext_resource type="PackedScene" uid="uid://cm1gc6wwu7n05" path="res://scenes/ui/end_screen/end_screen.tscn" id="9_kt6cu"]
 
 [node name="Level" type="Node2D"]
+process_mode = 1
 script = ExtResource("1_8kisy")
 
 [node name="Player" parent="." instance=ExtResource("4_1en8t")]
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(200, 2.08165e-12)
 zoom = Vector2(3, 3)
 process_callback = 0
 script = ExtResource("3_mujxj")
+
+[node name="EndScreen" parent="Camera2D" instance=ExtResource("9_kt6cu")]
+z_index = 101
+offset_left = -333.0
+offset_top = -188.0
+offset_right = 1587.0
+offset_bottom = 892.0
+scale = Vector2(0.35, 0.35)
+
+[node name="Background" type="Sprite2D" parent="Camera2D"]
+z_index = -10
+scale = Vector2(0.34, 0.34)
+texture = ExtResource("5_8a2bs")
+
+[node name="Health_UI" parent="Camera2D" instance=ExtResource("8_n68hn")]
+z_index = 10
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = -310.0
+offset_top = -172.0
+offset_right = 1610.0
+offset_bottom = 908.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.3, 0.3)
+
+[node name="DeathScreen" parent="Camera2D" instance=ExtResource("7_b853s")]
+z_index = 100
+offset_left = -333.0
+offset_top = -188.0
+offset_right = 1587.0
+offset_bottom = 892.0
+scale = Vector2(0.35, 0.35)
+
+[node name="TitleMenu" parent="Camera2D" instance=ExtResource("7_n68hn")]
+visible = false
+offset_left = -295.0
+offset_top = -158.0
+offset_right = 1625.0
+offset_bottom = 922.0
+scale = Vector2(0.3, 0.3)
+
+[node name="tutorial_text" parent="Camera2D" instance=ExtResource("8_1l6au")]
+process_mode = 3
+visible = false
+offset_left = -270.0
+offset_top = -150.0
+offset_right = -270.0
+offset_bottom = -150.0
+scale = Vector2(0.3, 0.3)
 
 [node name="Level_generator" parent="." instance=ExtResource("4_jexix")]

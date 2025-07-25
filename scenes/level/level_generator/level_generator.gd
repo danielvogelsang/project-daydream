@@ -9,6 +9,9 @@ var meshes
 var prototype_dictionary
 var all_tiles  = {
 }
+
+var worm_ending_coords
+
 signal generation_done
 
 var item_coords = []
@@ -167,15 +170,25 @@ func visualize_worm(worm_function):
 	for y in range(size.y):
 		for x in range(size.x):
 			var worm_tile = worm_function[y][x]
+			
 			if worm_tile == null:
 				continue
 			for tile in worm_tile:
 				var instance
+				#First Tile:
+				if x == 15 and y == 0:
+					print("ja!")
+					instance = load("uid://bgv2qdyta1jtp").instantiate()
+					instance.position.x = level_root.starting_x -900
+					instance.position.y = level_root.starting_y - 700
+					add_child(instance)
+					continue
+					
 				if check_item_coords(x,y):
-						print(x," ", y)
+						#print(x," ", y)
 						instance = load("uid://78pech8i1dyn").instantiate()
 						var item_pos = Vector2((x+0.5) * level_root.tile_size, (y-0.5) *level_root.tile_size * -1)
-						print(item_pos)
+						#print(item_pos)
 						Itempool.generate_item_drop(item_pos)
 				else:
 					instance = load(worm_tile[tile]["tile"]).instantiate()
@@ -185,6 +198,16 @@ func visualize_worm(worm_function):
 				instance.position.y -= y * level_root.tile_size
 				instance.position.x += x * level_root.tile_size
 				add_child(instance)
+				
+	#Für die Ending Transition:
+	var transition_uid = "uid://xd12lfa7prly"
+	var instance = load(transition_uid).instantiate()
+	instance.level_transition_triggered.connect(level_root._on_level_transition)
+	instance.position.x = level_root.tile_size * worm_ending_coords.x
+	instance.position.y = -1 * level_root.tile_size * worm_ending_coords.y  + level_root.tile_size/2
+	#print(instance, " ", instance.position.x, " ", instance.position.y)
+	add_child(instance)
+	
 	print("WF fertig!")
 	generation_done.emit()
 
@@ -231,6 +254,7 @@ func generate_worm(instance_worm):
 			coords = instance_worm.check_grid(coords)
 			#print(coords)
 			instance_worm.change_grid(coords)
+	worm_ending_coords = instance_worm.ending_coords
 	fill_worm(instance_worm)
 
 func start_worm_generation():
@@ -245,6 +269,7 @@ func check_item_coords(_x,_y):
 		if Vector2(_x,_y) == _coords:
 			return true
 	return false
+
 func _ready() -> void:
 	generation_done.connect(get_parent()._on_generation_done)
 	prototype_dictionary = get_prototypes()

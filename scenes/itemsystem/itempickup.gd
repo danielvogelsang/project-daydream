@@ -11,9 +11,9 @@ func _ready():
 	
 	if item and item.get_icon():
 		sprite.texture = item.get_icon()
-		sprite.scale = Vector2(0.5, 0.5)
+		sprite.scale = Vector2(1.3, 1.3)
 		item_description.text = item.description
-	
+		
 	add_to_group("item_spawn")
 
 func _on_body_entered(body):

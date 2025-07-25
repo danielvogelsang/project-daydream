@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://xd12lfa7prly"]
+
+[ext_resource type="Script" uid="uid://dqshhnlak433x" path="res://scenes/systems/level_transitions/next_level_transition.gd" id="1_0ridc"]
+[ext_resource type="Texture2D" uid="uid://bhwwdotk61dt8" path="res://textures/world/next_level_sprite.png" id="2_bqxbq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bqxbq"]
+size = Vector2(256, 256)
+
+[node name="level_transition" type="Node2D"]
+script = ExtResource("1_0ridc")
+
+[node name="next_level_transition" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="next_level_transition"]
+shape = SubResource("RectangleShape2D_bqxbq")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-0.5, 82)
+scale = Vector2(1.00391, 0.359375)
+texture = ExtResource("2_bqxbq")
+
+[connection signal="body_entered" from="next_level_transition" to="." method="_on_next_level_transition_body_entered"]
+[connection signal="body_entered" from="next_level_transition" to="next_level_transition" method="_on_body_entered"]

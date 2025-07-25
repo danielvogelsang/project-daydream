@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name Player
 
 const DIMINISHING_JUMP_VELOCITY: float = 0.5
 const GRAVITY: float = 600.0 
@@ -9,7 +10,7 @@ const base_health = 3
 
 @onready var anim_player: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player_inventory: PlayerInventory = $PlayerInventory
-
+@onready var hitflash: AnimationPlayer = $hitflash_player
 # state machine
 enum PlayerState {
 	IDLE,
@@ -85,7 +86,7 @@ var max_points: int = 100
 
 # no clip activates with debug button
 @export var is_no_clip: bool = false
-var no_clip_speed: float = 200.0
+var no_clip_speed: float = 500.0
 # quick respawn
 @export var quick_respawn: bool = false
 var respawn_window: float = 200
@@ -120,14 +121,15 @@ func change_state(new_state: PlayerState):
 # handles all inputs
 func get_input() -> void:
 	# horizontal movement
-	handle_horizontal_input()
+	if floating == false:
+		handle_horizontal_input()
 	
 	# jump
 	handle_jump_input()
 	
 	# stomp
 	handle_stomp_input()
-
+	
 func move_left() -> void:
 	current_direction = Playerdirection.LEFT
 	# slowdown if direction has changed in air
@@ -176,6 +178,10 @@ func handle_stomp_input() -> void:
 	if Input.is_action_just_pressed("down") and velocity.y > -stomp_apex:
 		velocity.y = MAX_FALL_SPEED
 
+func change_no_clip():
+	return #demo
+	if Input.is_action_just_pressed("debug"):
+		is_no_clip = !is_no_clip
 # handles direction changes midair and starts slowdown timer
 func direction_change_slowdown() -> void:
 	# saves global x position for comparison
@@ -288,7 +294,7 @@ func handle_no_clip() -> void:
 			velocity.x += no_clip_speed
 		if Input.is_action_pressed("left"):
 			velocity.x -= no_clip_speed
-		if Input.is_action_pressed("jump"):
+		if Input.is_action_pressed("up") or Input.is_action_pressed("jump"):
 			velocity.y -= no_clip_speed
 		if Input.is_action_pressed("down"):
 			velocity.y += no_clip_speed
@@ -296,7 +302,7 @@ func handle_no_clip() -> void:
 	
 func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
 	var camera = $"../Camera2D"
-	if camera.current_mode == camera.camera_mode.PLAYER:
+	if camera.current_mode == camera.camera_mode.PLAYER and is_no_clip == false:
 		take_damage()
 	
 	
@@ -313,6 +319,7 @@ func take_damage():
 	print(health)
 	if health != 0:
 		position = Vector2(last_x_position_on_floor, last_y_position_on_floor)
+		hitflash.play("hitflash")
 	else:
 		death()
 		death_signal.emit()
@@ -326,6 +333,7 @@ func debugging() -> void:
 	handle_quick_respawn()
 	
 func _physics_process(delta: float) -> void:
+	change_no_clip()
 	if is_no_clip:
 		process_no_clip(delta)
 	else:
@@ -346,3 +354,7 @@ func process_normal(delta:float) -> void:
 
 func process_no_clip(_delta: float) -> void:
 	handle_no_clip()
+
+
+func _on_visible_on_screen_enabler_2d_screen_entered() -> void:
+	pass # Replace with function body.

@@ -1,0 +1,59 @@
+[gd_scene load_steps=4 format=3 uid="uid://c6e4gb6h1utqq"]
+
+[ext_resource type="Script" uid="uid://cc5cn44p0dwdy" path="res://scenes/ui/loading_screen/death_screen.gd" id="1_5ltjm"]
+[ext_resource type="Texture2D" uid="uid://0bess2x5xxn1" path="res://textures/ui/icons/controller_input_icons/Button/A_color_dark.png" id="2_trwrg"]
+[ext_resource type="Texture2D" uid="uid://bs26ekj5u172s" path="res://textures/ui/icons/keyboard_icons/P_gr.png" id="3_tfxvr"]
+
+[node name="DeathScreen" type="Control"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+script = ExtResource("1_5ltjm")
+
+[node name="death_screen" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="death_screen"]
+layout_mode = 0
+offset_left = 341.0
+offset_top = 424.0
+offset_right = 1804.0
+offset_bottom = 619.0
+theme_override_font_sizes/font_size = 60
+text = "                              AUTSCH!
+Du bist leider vom Sturz aufgewacht :("
+
+[node name="Label2" type="Label" parent="death_screen"]
+layout_mode = 0
+offset_left = 1125.0
+offset_top = 913.0
+offset_right = 1724.0
+offset_bottom = 982.0
+theme_override_font_sizes/font_size = 50
+text = "Wieder einschlafen:        /"
+
+[node name="a_controller" type="TextureRect" parent="death_screen"]
+layout_mode = 0
+offset_left = 1620.0
+offset_top = 914.0
+offset_right = 1693.0
+offset_bottom = 987.0
+texture = ExtResource("2_trwrg")
+expand_mode = 1
+
+[node name="p_keyboard" type="TextureRect" parent="death_screen"]
+layout_mode = 0
+offset_left = 1748.0
+offset_top = 916.0
+offset_right = 1817.0
+offset_bottom = 986.0
+texture = ExtResource("3_tfxvr")
+expand_mode = 1
