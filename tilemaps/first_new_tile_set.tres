@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://dd7mwloupshna"]
+[gd_resource type="TileSet" format=3 uid="uid://dd7mwloupshna"]
 
 [ext_resource type="Texture2D" uid="uid://bntxm0sfwgyrx" path="res://textures/world/platform_tile.png" id="1_ebx6h"]
 [ext_resource type="Texture2D" uid="uid://bt1aluoa8ug02" path="res://textures/world/spike_test_001.png" id="2_3x7e0"]
